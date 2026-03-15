@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aylık Gelir Gider Tablosu</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --surface-color: #1e1e1e;
+            --border-color: #333;
+            --text-color: #e0e0e0;
+            --income-color: #4ade80;
+            --income-bg: rgba(74, 222, 128, 0.1);
+            --expense-color: #f87171;
+            --expense-bg: rgba(248, 113, 113, 0.1);
+            --header-bg: #2a2a2a;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            font-weight: 400;
+            margin-bottom: 20px;
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: var(--surface-color);
+            text-align: right;
+            min-width: 900px;
+        }
+
+        th, td {
+            padding: 12px 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--header-bg);
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .month-col {
+            text-align: left;
+            font-weight: 600;
+            background-color: var(--header-bg);
+        }
+
+        input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            text-align: right;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        input:focus {
+            outline: none;
+            border-bottom: 1px solid #fff;
+        }
+        
+        /* Oklari gizleme */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+
+        .income-group { background-color: var(--income-bg); }
+        .expense-group { background-color: var(--expense-bg); }
+        
+        .total-cell {
+            font-weight: bold;
+        }
+        .t-income { color: var(--income-color); }
+        .t-expense { color: var(--expense-color); }
+        
+    </style>
+</head>
+<body>
+
+    <h2>Aylık Gelir Gider Tablosu</h2>
+    
+    <div class="table-container">
+        <table id="financeTable">
+            <thead>
+                <tr>
+                    <th rowspan="2" class="month-col">Aylar</th>
+                    <th colspan="3" class="income-group" style="color: var(--income-color)">Gelirler</th>
+                    <th colspan="6" class="expense-group" style="color: var(--expense-color)">Giderler</th>
+                    <th rowspan="2">Kalan (Net)</th>
+                </tr>
+                <tr>
+                    <th class="income-group">Batıkan Maaş</th>
+                    <th class="income-group">Işıl Maaş</th>
+                    <th class="income-group">Toplam Gelir</th>
+                    <th class="expense-group">Kredi Kartları</th>
+                    <th class="expense-group">Kira</th>
+                    <th class="expense-group">Fatura</th>
+                    <th class="expense-group">Market</th>
+                    <th class="expense-group">Kredi / Araba</th>
+                    <th class="expense-group">Toplam Gider</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+    </div>
+
+    <script>
+        const months = ["Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık", "Ocak"];
+        const tbody = document.querySelector("#financeTable tbody");
+
+        // Formatlayıcı
+        const formatCurrency = (num) => {
+            if (num === 0) return "0 ₺";
+            return num.toLocaleString('tr-TR') + " ₺";
+        };
+
+        // Tabloyu oluşturma
+        months.forEach(month => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td class="month-col">${month}</td>
+                <td class="income-group"><input type="number" class="income" placeholder="0"></td>
+                <td class="income-group"><input type="number" class="income" placeholder="0"></td>
+                <td class="income-group total-cell t-income">0 ₺</td>
+                
+                <td class="expense-group"><input type="number" class="expense" placeholder="0"></td>
+                <td class="expense-group"><input type="number" class="expense" placeholder="0"></td>
+                <td class="expense-group"><input type="number" class="expense" placeholder="0"></td>
+                <td class="expense-group"><input type="number" class="expense" placeholder="0"></td>
+                <td class="expense-group"><input type="number" class="expense" placeholder="0"></td>
+                <td class="expense-group total-cell t-expense">0 ₺</td>
+                
+                <td class="total-cell t-net">0 ₺</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // Hesaplama Mantığı
+        document.getElementById("financeTable").addEventListener("input", function(e) {
+            if (e.target.tagName === "INPUT") {
+                const row = e.target.closest("tr");
+                
+                // Gelirleri Topla
+                let totalIncome = 0;
+                row.querySelectorAll(".income").forEach(input => {
+                    totalIncome += Number(input.value) || 0;
+                });
+                row.querySelector(".t-income").textContent = formatCurrency(totalIncome);
+
+                // Giderleri Topla (Excel'deki gibi eksi değer girmeye gerek yok, pozitif girildiğini varsayıyoruz)
+                let totalExpense = 0;
+                row.querySelectorAll(".expense").forEach(input => {
+                    // Kullanıcı eksi girerse diye Math.abs ile mutlak değerini alıyoruz
+                    totalExpense += Math.abs(Number(input.value)) || 0; 
+                });
+                row.querySelector(".t-expense").textContent = formatCurrency(totalExpense);
+
+                // Net Kalan
+                const net = totalIncome - totalExpense;
+                const netCell = row.querySelector(".t-net");
+                netCell.textContent = formatCurrency(net);
+
+                // Renklendirme
+                if (net > 0) {
+                    netCell.style.color = "var(--income-color)";
+                } else if (net < 0) {
+                    netCell.style.color = "var(--expense-color)";
+                } else {
+                    netCell.style.color = "inherit";
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+
