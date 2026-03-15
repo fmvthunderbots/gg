@@ -3,18 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aylık Gelir Gider Tablosu</title>
+    <title>Gelişmiş Gelir Gider Tablosu</title>
     <style>
         :root {
-            --bg-color: #121212;
-            --surface-color: #1e1e1e;
-            --border-color: #333;
-            --text-color: #e0e0e0;
-            --income-color: #4ade80;
-            --income-bg: rgba(74, 222, 128, 0.1);
+            /* Göz yormayan karanlık tema renkleri */
+            --bg-color: #1a1a24;
+            --surface-color: #252533;
+            --border-color: #3b3b4f;
+            --text-color: #e2e8f0;
+            --text-muted: #94a3b8;
+            --income-color: #34d399;
             --expense-color: #f87171;
-            --expense-bg: rgba(248, 113, 113, 0.1);
-            --header-bg: #2a2a2a;
+            --header-bg: #2d2d3f;
+            --hover-bg: #323246;
+            --btn-blue: #3b82f6;
+            --btn-green: #10b981;
         }
 
         body {
@@ -27,28 +30,61 @@
 
         h2 {
             text-align: center;
-            font-weight: 400;
-            margin-bottom: 20px;
+            font-weight: 300;
+            margin-top: 0;
+            color: #fff;
         }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        button, .file-label {
+            background-color: var(--surface-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+
+        button:hover, .file-label:hover {
+            background-color: var(--hover-bg);
+            border-color: var(--text-muted);
+        }
+
+        .btn-primary { background-color: var(--btn-blue); color: #fff; border: none; }
+        .btn-primary:hover { background-color: #2563eb; }
+        
+        .btn-success { background-color: var(--btn-green); color: #fff; border: none; }
+        .btn-success:hover { background-color: #059669; }
 
         .table-container {
             width: 100%;
             overflow-x: auto;
             border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+            background-color: var(--surface-color);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            background-color: var(--surface-color);
             text-align: right;
-            min-width: 900px;
+            min-width: 1000px;
         }
 
         th, td {
-            padding: 12px 10px;
+            padding: 10px;
             border: 1px solid var(--border-color);
+            position: relative;
         }
 
         th {
@@ -57,13 +93,11 @@
             text-align: center;
         }
 
-        .month-col {
-            text-align: left;
-            font-weight: 600;
-            background-color: var(--header-bg);
-        }
+        .text-income { color: var(--income-color); }
+        .text-expense { color: var(--expense-color); }
+        .total-cell { font-weight: bold; background-color: rgba(0,0,0,0.15); }
 
-        input {
+        input[type="number"] {
             width: 100%;
             background: transparent;
             border: none;
@@ -71,128 +105,307 @@
             text-align: right;
             font-size: 14px;
             font-family: inherit;
+            box-sizing: border-box;
+            padding: 4px;
+            border-radius: 4px;
         }
 
-        input:focus {
+        input[type="number"]:focus {
             outline: none;
-            border-bottom: 1px solid #fff;
+            background-color: rgba(255,255,255,0.05);
         }
-        
-        /* Oklari gizleme */
+
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { 
-            -webkit-appearance: none; 
-            margin: 0; 
+            -webkit-appearance: none; margin: 0; 
         }
 
-        .income-group { background-color: var(--income-bg); }
-        .expense-group { background-color: var(--expense-bg); }
-        
-        .total-cell {
-            font-weight: bold;
+        [contenteditable="true"] {
+            border-bottom: 1px dashed var(--text-muted);
+            outline: none;
+            padding: 2px 4px;
+            min-width: 50px;
+            display: inline-block;
         }
-        .t-income { color: var(--income-color); }
-        .t-expense { color: var(--expense-color); }
         
+        [contenteditable="true"]:focus {
+            border-bottom: 1px solid #fff;
+            background-color: rgba(255,255,255,0.05);
+        }
+
+        .delete-btn {
+            color: var(--expense-color);
+            cursor: pointer;
+            font-size: 12px;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+            margin-right: 6px;
+            user-select: none;
+        }
+        .delete-btn:hover { opacity: 1; }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .month-cell {
+            text-align: left;
+            display: flex;
+            align-items: center;
+        }
+
     </style>
 </head>
 <body>
 
     <h2>Aylık Gelir Gider Tablosu</h2>
+
+    <div class="controls">
+        <button onclick="addRow()">+ Ay (Satır) Ekle</button>
+        <button onclick="addCol()">+ Gider Sütunu Ekle</button>
+        <button class="btn-success" onclick="exportData()">💾 Veriyi İndir (Yedekle)</button>
+        <label class="file-label btn-primary">
+            📂 Veri Yükle <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+        </label>
+    </div>
     
     <div class="table-container">
         <table id="financeTable">
-            <thead>
-                <tr>
-                    <th rowspan="2" class="month-col">Aylar</th>
-                    <th colspan="3" class="income-group" style="color: var(--income-color)">Gelirler</th>
-                    <th colspan="6" class="expense-group" style="color: var(--expense-color)">Giderler</th>
-                    <th rowspan="2">Kalan (Net)</th>
-                </tr>
-                <tr>
-                    <th class="income-group">Batıkan Maaş</th>
-                    <th class="income-group">Işıl Maaş</th>
-                    <th class="income-group">Toplam Gelir</th>
-                    <th class="expense-group">Kredi Kartları</th>
-                    <th class="expense-group">Kira</th>
-                    <th class="expense-group">Fatura</th>
-                    <th class="expense-group">Market</th>
-                    <th class="expense-group">Kredi / Araba</th>
-                    <th class="expense-group">Toplam Gider</th>
-                </tr>
-            </thead>
-            <tbody>
+            <thead id="tableHead">
+                </thead>
+            <tbody id="tableBody">
                 </tbody>
         </table>
     </div>
 
     <script>
-        const months = ["Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık", "Ocak"];
-        const tbody = document.querySelector("#financeTable tbody");
+        // Varsayılan Başlangıç Verisi (Eğer tarayıcıda kayıt yoksa)
+        const defaultData = {
+            expenseHeaders: ["Kredi Kartları", "Kira", "Fatura", "Market", "Kredi / Araba"],
+            rows: [
+                { month: "Şubat", inc1: "", inc2: "", exps: ["", "", "", "", ""] },
+                { month: "Mart", inc1: "", inc2: "", exps: ["", "", "", "", ""] }
+            ]
+        };
 
-        // Formatlayıcı
+        // Tarayıcı hafızasından veriyi çek
+        let currentData = JSON.parse(localStorage.getItem("budgetData")) || defaultData;
+
+        const table = document.getElementById("financeTable");
+        const thead = document.getElementById("tableHead");
+        const tbody = document.getElementById("tableBody");
+
+        // Sayı formatlayıcı
         const formatCurrency = (num) => {
             if (num === 0) return "0 ₺";
             return num.toLocaleString('tr-TR') + " ₺";
         };
 
-        // Tabloyu oluşturma
-        months.forEach(month => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-                <td class="month-col">${month}</td>
-                <td class="income-group"><input type="number" class="income" placeholder="0"></td>
-                <td class="income-group"><input type="number" class="income" placeholder="0"></td>
-                <td class="income-group total-cell t-income">0 ₺</td>
-                
-                <td class="expense-group"><input type="number" class="expense" placeholder="0"></td>
-                <td class="expense-group"><input type="number" class="expense" placeholder="0"></td>
-                <td class="expense-group"><input type="number" class="expense" placeholder="0"></td>
-                <td class="expense-group"><input type="number" class="expense" placeholder="0"></td>
-                <td class="expense-group"><input type="number" class="expense" placeholder="0"></td>
-                <td class="expense-group total-cell t-expense">0 ₺</td>
-                
-                <td class="total-cell t-net">0 ₺</td>
+        // Tabloyu Ekrana Çizme Fonksiyonu
+        function renderTable() {
+            // --- Başlıkları Çiz ---
+            let headHTML = `
+                <tr>
+                    <th rowspan="2" style="width: 120px;">Aylar</th>
+                    <th colspan="3" class="text-income">Gelirler</th>
+                    <th colspan="${currentData.expenseHeaders.length + 1}" class="text-expense">Giderler</th>
+                    <th rowspan="2">Kalan (Net)</th>
+                </tr>
+                <tr>
+                    <th class="text-income">Batıkan Maaş</th>
+                    <th class="text-income">Işıl Maaş</th>
+                    <th class="text-income total-cell">Toplam Gelir</th>
             `;
-            tbody.appendChild(tr);
+            
+            currentData.expenseHeaders.forEach((header, index) => {
+                headHTML += `
+                    <th class="text-expense">
+                        <div class="header-content">
+                            <span class="delete-btn" onclick="removeCol(${index})" title="Sütunu Sil">✖</span>
+                            <span contenteditable="true" class="exp-header-text">${header}</span>
+                        </div>
+                    </th>
+                `;
+            });
+            
+            headHTML += `<th class="text-expense total-cell">Toplam Gider</th></tr>`;
+            thead.innerHTML = headHTML;
+
+            // --- Satırları Çiz ---
+            let bodyHTML = "";
+            currentData.rows.forEach((row, rIndex) => {
+                let expensesHTML = "";
+                row.exps.forEach((exp) => {
+                    expensesHTML += `<td><input type="number" class="exp-val" value="${exp}" placeholder="0"></td>`;
+                });
+
+                bodyHTML += `
+                    <tr>
+                        <td class="month-cell">
+                            <span class="delete-btn" onclick="removeRow(${rIndex})" title="Satırı Sil">✖</span>
+                            <span contenteditable="true" class="month-name">${row.month}</span>
+                        </td>
+                        <td><input type="number" class="inc1" value="${row.inc1}" placeholder="0"></td>
+                        <td><input type="number" class="inc2" value="${row.inc2}" placeholder="0"></td>
+                        <td class="total-cell text-income row-inc-total">0 ₺</td>
+                        ${expensesHTML}
+                        <td class="total-cell text-expense row-exp-total">0 ₺</td>
+                        <td class="total-cell row-net">0 ₺</td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = bodyHTML;
+
+            // Çizim bittikten sonra tüm toplamları hesapla
+            updateAllTotals();
+        }
+
+        // Tablodaki verileri okuyup State'e (currentData) kaydetme
+        function scrapeAndSave() {
+            // Başlıkları oku
+            const headerSpans = document.querySelectorAll('.exp-header-text');
+            currentData.expenseHeaders = Array.from(headerSpans).map(span => span.innerText.trim());
+
+            // Satırları oku
+            const trs = tbody.querySelectorAll('tr');
+            currentData.rows = Array.from(trs).map(tr => {
+                return {
+                    month: tr.querySelector('.month-name').innerText.trim(),
+                    inc1: tr.querySelector('.inc1').value,
+                    inc2: tr.querySelector('.inc2').value,
+                    exps: Array.from(tr.querySelectorAll('.exp-val')).map(inp => inp.value)
+                };
+            });
+
+            // Tarayıcıya kaydet
+            localStorage.setItem("budgetData", JSON.stringify(currentData));
+        }
+
+        // Tek bir satırın matematiksel hesabını yapma
+        function calculateRow(tr) {
+            const inc1 = Number(tr.querySelector('.inc1').value) || 0;
+            const inc2 = Number(tr.querySelector('.inc2').value) || 0;
+            const totalInc = inc1 + inc2;
+            
+            let totalExp = 0;
+            tr.querySelectorAll('.exp-val').forEach(inp => {
+                totalExp += Math.abs(Number(inp.value)) || 0;
+            });
+
+            const net = totalInc - totalExp;
+
+            tr.querySelector('.row-inc-total').textContent = formatCurrency(totalInc);
+            tr.querySelector('.row-exp-total').textContent = formatCurrency(totalExp);
+            
+            const netCell = tr.querySelector('.row-net');
+            netCell.textContent = formatCurrency(net);
+            
+            if (net > 0) netCell.style.color = "var(--income-color)";
+            else if (net < 0) netCell.style.color = "var(--expense-color)";
+            else netCell.style.color = "inherit";
+        }
+
+        // Tüm satırları hesapla (İlk açılışta veya sütun eklendiğinde)
+        function updateAllTotals() {
+            tbody.querySelectorAll('tr').forEach(tr => calculateRow(tr));
+        }
+
+        // --- OLAY DİNLEYİCİLERİ (Event Listeners) ---
+
+        // Tabloda herhangi bir input değiştiğinde veya başlık yazıldığında
+        table.addEventListener('input', (e) => {
+            if (e.target.tagName === 'INPUT') {
+                calculateRow(e.target.closest('tr'));
+            }
+            scrapeAndSave(); // Anında tarayıcıya kaydet
         });
 
-        // Hesaplama Mantığı
-        document.getElementById("financeTable").addEventListener("input", function(e) {
-            if (e.target.tagName === "INPUT") {
-                const row = e.target.closest("tr");
-                
-                // Gelirleri Topla
-                let totalIncome = 0;
-                row.querySelectorAll(".income").forEach(input => {
-                    totalIncome += Number(input.value) || 0;
-                });
-                row.querySelector(".t-income").textContent = formatCurrency(totalIncome);
-
-                // Giderleri Topla (Excel'deki gibi eksi değer girmeye gerek yok, pozitif girildiğini varsayıyoruz)
-                let totalExpense = 0;
-                row.querySelectorAll(".expense").forEach(input => {
-                    // Kullanıcı eksi girerse diye Math.abs ile mutlak değerini alıyoruz
-                    totalExpense += Math.abs(Number(input.value)) || 0; 
-                });
-                row.querySelector(".t-expense").textContent = formatCurrency(totalExpense);
-
-                // Net Kalan
-                const net = totalIncome - totalExpense;
-                const netCell = row.querySelector(".t-net");
-                netCell.textContent = formatCurrency(net);
-
-                // Renklendirme
-                if (net > 0) {
-                    netCell.style.color = "var(--income-color)";
-                } else if (net < 0) {
-                    netCell.style.color = "var(--expense-color)";
-                } else {
-                    netCell.style.color = "inherit";
-                }
+        // Enter tuşuna basıldığında alt satıra geçmeyi engelle (Başlık düzenlerken bozulmaması için)
+        table.addEventListener('keydown', (e) => {
+            if (e.target.hasAttribute('contenteditable') && e.key === 'Enter') {
+                e.preventDefault();
+                e.target.blur();
             }
         });
+
+        // --- BUTON FONKSİYONLARI ---
+
+        function addRow() {
+            scrapeAndSave(); // Önce mevcut durumu güvenceye al
+            const emptyExps = new Array(currentData.expenseHeaders.length).fill("");
+            currentData.rows.push({ month: "Yeni Ay", inc1: "", inc2: "", exps: emptyExps });
+            renderTable();
+            scrapeAndSave();
+        }
+
+        function removeRow(index) {
+            if(confirm("Bu ayı silmek istediğinize emin misiniz?")) {
+                currentData.rows.splice(index, 1);
+                renderTable();
+                scrapeAndSave();
+            }
+        }
+
+        function addCol() {
+            scrapeAndSave();
+            currentData.expenseHeaders.push("Yeni Gider");
+            currentData.rows.forEach(row => row.exps.push(""));
+            renderTable();
+            scrapeAndSave();
+        }
+
+        function removeCol(index) {
+            if(confirm("Bu gider sütununu tamamen silmek istediğinize emin misiniz?")) {
+                currentData.expenseHeaders.splice(index, 1);
+                currentData.rows.forEach(row => row.exps.splice(index, 1));
+                renderTable();
+                scrapeAndSave();
+            }
+        }
+
+        // --- VERİ İNDİRME VE YÜKLEME ---
+
+        function exportData() {
+            scrapeAndSave(); // Son durumu al
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentData));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", "gelir_gider_yedek.json");
+            document.body.appendChild(dlAnchorElem);
+            dlAnchorElem.click();
+            dlAnchorElem.remove();
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (importedData.expenseHeaders && importedData.rows) {
+                        currentData = importedData;
+                        renderTable();
+                        scrapeAndSave();
+                        alert("Veri başarıyla yüklendi!");
+                    } else {
+                        alert("Hata: Yüklenen dosya uygun formatta değil.");
+                    }
+                } catch (err) {
+                    alert("Dosya okuma hatası oluştu!");
+                }
+                // Aynı dosyayı tekrar yükleyebilmek için inputu temizle
+                document.getElementById('importFile').value = ""; 
+            };
+            reader.readAsText(file);
+        }
+
+        // İlk açılışta tabloyu çiz
+        renderTable();
+
     </script>
 </body>
 </html>
-
