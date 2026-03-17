@@ -6,7 +6,6 @@
     <title>Aylık Gelir Gider Tablosu</title>
     <style>
         :root {
-            /* Aydınlık, ferah ve modern tema renkleri */
             --bg-color: #f4f7f9;
             --surface-color: #ffffff;
             --border-color: #e2e8f0;
@@ -84,7 +83,8 @@
             width: 100%;
             border-collapse: collapse;
             text-align: right;
-            min-width: 1300px;
+            /* Tablonun içerik ne kadar uzunsa o kadar genişlemesini, asla sıkışmamasını sağlar */
+            min-width: max-content; 
         }
 
         th, td {
@@ -102,10 +102,11 @@
 
         .text-income { color: var(--income-color); }
         .text-expense { color: var(--expense-color); }
-        .total-cell { font-weight: bold; background-color: #f8fafc; }
+        .total-cell { font-weight: bold; background-color: #f8fafc; white-space: nowrap; }
 
         input[type="number"] {
             width: 100%;
+            min-width: 80px; /* Rakamların sığması için garanti genişlik alanı */
             background: transparent;
             border: none;
             color: var(--text-color);
@@ -166,9 +167,9 @@
             display: flex;
             align-items: center;
             font-weight: 500;
+            min-width: 90px;
         }
 
-        /* Satır ve Sütun Ekleme Butonları (Tablo İçi) */
         .add-col-btn {
             background-color: #e2e8f0;
             border: none;
@@ -187,10 +188,8 @@
         }
         .add-col-btn:hover { background-color: #cbd5e1; color: var(--btn-blue); }
 
-        .add-row-cell {
-            padding: 0 !important;
-            border: none !important;
-        }
+        .add-row-cell { padding: 0 !important; border: none !important; }
+        
         .add-row-btn {
             width: 100%;
             background-color: var(--header-bg);
@@ -204,12 +203,8 @@
             transition: all 0.2s;
             border-radius: 0 0 12px 12px;
         }
-        .add-row-btn:hover {
-            background-color: #e2e8f0;
-            color: var(--btn-blue);
-        }
+        .add-row-btn:hover { background-color: #e2e8f0; color: var(--btn-blue); }
 
-        /* Bildirim Pop-up */
         #toast {
             position: fixed;
             bottom: 30px;
@@ -235,7 +230,7 @@
     <h2>Aylık Gelir Gider Tablosu</h2>
 
     <div class="controls">
-        <button class="top-btn btn-success" onclick="manualSave()" style="font-size: 15px;">💾 Tarayıcıya Kaydet</button>
+        <button class="top-btn btn-success" onclick="manualSave()">💾 Tarayıcıya Kaydet</button>
         <button class="top-btn btn-primary" onclick="exportData()">⬇️ Yedeği İndir</button>
         <label class="file-label">
             📂 Yedek Yükle <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
@@ -244,17 +239,14 @@
     
     <div class="table-container">
         <table id="financeTable">
-            <thead id="tableHead">
-                </thead>
-            <tbody id="tableBody">
-                </tbody>
+            <thead id="tableHead"></thead>
+            <tbody id="tableBody"></tbody>
         </table>
     </div>
 
     <div id="toast">✅ Başarıyla Kaydedildi!</div>
 
     <script>
-        // İstenen bankalar, giderler ve fotoğraflardan çekilen maaşlar (Şubat'tan Ocak'a kadar)
         const defaultData = {
             expenseHeaders: [
                 "Axess", "Wings", "Money", "Garanti", 
@@ -278,7 +270,7 @@
             ]
         };
 
-        // Eski kayıtlarla çakışmaması ve maaşların yüklenebilmesi için localStorage ismini güncelledik: budgetDataLightV3
+        // Veri okuma: Eğer daha önce V3 kaydı varsa onu alır, yoksa yukarıdaki defaultları yükler.
         let currentData = JSON.parse(localStorage.getItem("budgetDataLightV3")) || defaultData;
 
         const table = document.getElementById("financeTable");
@@ -293,7 +285,7 @@
         function renderTable() {
             let headHTML = `
                 <tr>
-                    <th rowspan="2" style="width: 120px;">Aylar</th>
+                    <th rowspan="2">Aylar</th>
                     <th colspan="3" class="text-income">Gelirler</th>
                     <th colspan="${currentData.expenseHeaders.length + 2}" class="text-expense">Giderler</th>
                     <th rowspan="2">Kalan (Net)</th>
@@ -316,7 +308,7 @@
             });
             
             headHTML += `
-                    <th class="text-expense total-cell" style="min-width: 110px;">Toplam Gider</th>
+                    <th class="text-expense total-cell">Toplam Gider</th>
                     <th style="width: 45px; padding: 6px;">
                         <button class="add-col-btn" onclick="addCol()" title="Yeni Gider Sütunu Ekle">+</button>
                     </th>
@@ -343,7 +335,7 @@
                         ${expensesHTML}
                         <td class="total-cell text-expense row-exp-total">0 ₺</td>
                         <td style="background-color: var(--header-bg);"></td>
-                        <td class="total-cell row-net" style="min-width: 110px;">0 ₺</td>
+                        <td class="total-cell row-net">0 ₺</td>
                     </tr>
                 `;
             });
@@ -352,7 +344,7 @@
             bodyHTML += `
                 <tr>
                     <td colspan="${totalColumns}" class="add-row-cell">
-                        <button class="add-row-btn" onclick="addRow()">+ Yeni Ay (Satır) Ekle</button>
+                        <button class="add-row-btn" onclick="addRow()">+ Yeni Ay Ekle</button>
                     </td>
                 </tr>
             `;
