@@ -84,7 +84,7 @@
             width: 100%;
             border-collapse: collapse;
             text-align: right;
-            min-width: 1300px; /* Sütunlar arttığı için genişliği biraz artırdık */
+            min-width: 1300px;
         }
 
         th, td {
@@ -254,7 +254,7 @@
     <div id="toast">✅ Başarıyla Kaydedildi!</div>
 
     <script>
-        // İstenen yeni sütun başlıkları ve boşlukları
+        // İstenen bankalar, giderler ve fotoğraflardan çekilen maaşlar (Şubat'tan Ocak'a kadar)
         const defaultData = {
             expenseHeaders: [
                 "Axess", "Wings", "Money", "Garanti", 
@@ -263,13 +263,23 @@
                 "Diğer", "Araba"
             ],
             rows: [
-                { month: "Şubat", inc1: "", inc2: "", exps: ["", "", "", "", "", "", "", "", "", "", "", ""] },
-                { month: "Mart", inc1: "", inc2: "", exps: ["", "", "", "", "", "", "", "", "", "", "", ""] }
+                { month: "Şubat", inc1: "114000", inc2: "108000", exps: ["", "", "", "", "", "", "", "", "", "", "", ""] },
+                { month: "Mart", inc1: "110750", inc2: "105000", exps: ["", "", "", "", "", "", "", "", "", "", "", ""] },
+                { month: "Nisan", inc1: "107900", inc2: "102000", exps: ["", "", "", "", "", "", "", "", "", "", "", ""] },
+                { month: "Mayıs", inc1: "99250", inc2: "95500", exps: ["", "", "", "", "", "", "", "", "", "", "", ""] },
+                { month: "Haziran", inc1: "98750", inc2: "93250", exps: ["", "", "", "", "", "", "", "", "", "", "", ""] },
+                { month: "Temmuz", inc1: "98750", inc2: "93250", exps: ["", "", "", "", "", "", "", "", "", "", "", ""] },
+                { month: "Ağustos", inc1: "99000", inc2: "93600", exps: ["", "", "", "", "", "", "", "", "", "", "", ""] },
+                { month: "Eylül", inc1: "100150", inc2: "94725", exps: ["", "", "", "", "", "", "", "", "", "", "", ""] },
+                { month: "Ekim", inc1: "100150", inc2: "94725", exps: ["", "", "", "", "", "", "", "", "", "", "", ""] },
+                { month: "Kasım", inc1: "100150", inc2: "94725", exps: ["", "", "", "", "", "", "", "", "", "", "", ""] },
+                { month: "Aralık", inc1: "100150", inc2: "94725", exps: ["", "", "", "", "", "", "", "", "", "", "", ""] },
+                { month: "Ocak", inc1: "94600", inc2: "94725", exps: ["", "", "", "", "", "", "", "", "", "", "", ""] }
             ]
         };
 
-        // Eski kayıtlarla çakışmaması için localStorage ismini güncelledik: budgetDataLightV2
-        let currentData = JSON.parse(localStorage.getItem("budgetDataLightV2")) || defaultData;
+        // Eski kayıtlarla çakışmaması ve maaşların yüklenebilmesi için localStorage ismini güncelledik: budgetDataLightV3
+        let currentData = JSON.parse(localStorage.getItem("budgetDataLightV3")) || defaultData;
 
         const table = document.getElementById("financeTable");
         const thead = document.getElementById("tableHead");
@@ -365,7 +375,7 @@
                 };
             });
 
-            localStorage.setItem("budgetDataLightV2", JSON.stringify(currentData));
+            localStorage.setItem("budgetDataLightV3", JSON.stringify(currentData));
         }
 
         function calculateRow(tr) {
