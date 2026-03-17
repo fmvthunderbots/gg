@@ -80,14 +80,14 @@
         }
 
         table {
-            width: max-content; /* İçerik kadar genişler, gereksiz uzamaz */
+            width: max-content; 
             border-collapse: collapse;
             text-align: right;
             margin: 0 auto;
         }
 
         th, td {
-            padding: 8px 6px; /* Hücre içi boşlukları daralttık */
+            padding: 8px 6px; 
             border: 1px solid var(--border-color);
             position: relative;
         }
@@ -97,7 +97,7 @@
             font-weight: 600;
             text-align: center;
             color: #475569;
-            font-size: 13px; /* Başlıkları bir tık küçülttük */
+            font-size: 13px; 
         }
 
         .text-income { color: var(--income-color); }
@@ -105,7 +105,7 @@
         .total-cell { font-weight: bold; background-color: #f8fafc; white-space: nowrap; padding: 8px 10px; }
 
         input[type="number"] {
-            width: 75px; /* Tam istediğin gibi 'Toplam Gelir' genişliğine sabitlendi */
+            width: 75px; 
             background: transparent;
             border: none;
             color: var(--text-color);
@@ -135,7 +135,7 @@
             outline: none;
             padding: 2px;
             min-width: 40px;
-            max-width: 80px; /* Uzun başlıkları alt satıra iterek sütunun uzamasını engeller */
+            max-width: 80px; 
             display: inline-block;
             transition: border-color 0.2s;
             word-wrap: break-word;
@@ -162,6 +162,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            margin-bottom: 4px;
         }
         
         .month-cell {
@@ -170,6 +171,23 @@
             align-items: center;
             font-weight: 500;
             min-width: 65px;
+        }
+
+        /* Hızlı Doldur Şimşek İkonu */
+        .fill-icon {
+            cursor: pointer;
+            font-size: 15px;
+            display: inline-block;
+            opacity: 0.5;
+            transition: all 0.2s;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background-color: #e2e8f0;
+        }
+        .fill-icon:hover {
+            opacity: 1;
+            background-color: #cbd5e1;
+            transform: scale(1.1);
         }
 
         .add-col-btn {
@@ -272,7 +290,7 @@
             ]
         };
 
-        // Eski kayıtlarla çakışmaması ve maaşların yüklenebilmesi için localStorage ismini güncelledik: budgetDataLightV3
+        // Verileri hafızadan çekiyoruz (Önceki maaş girişleri vb. korunacak)
         let currentData = JSON.parse(localStorage.getItem("budgetDataLightV3")) || defaultData;
 
         const table = document.getElementById("financeTable");
@@ -293,8 +311,14 @@
                     <th rowspan="2">Kalan (Net)</th>
                 </tr>
                 <tr>
-                    <th class="text-income">Batıkan<br>Maaş</th>
-                    <th class="text-income">Işıl<br>Maaş</th>
+                    <th class="text-income">
+                        Batıkan<br>Maaş<br>
+                        <span class="fill-icon" onclick="fillAll('inc1', 'Batıkan Maaş')" title="Tümüne Uygula">⚡</span>
+                    </th>
+                    <th class="text-income">
+                        Işıl<br>Maaş<br>
+                        <span class="fill-icon" onclick="fillAll('inc2', 'Işıl Maaş')" title="Tümüne Uygula">⚡</span>
+                    </th>
                     <th class="text-income total-cell">Toplam<br>Gelir</th>
             `;
             
@@ -305,6 +329,7 @@
                             <span class="delete-btn" onclick="removeCol(${index})" title="Sütunu Sil">✖</span>
                             <span contenteditable="true" class="exp-header-text">${header}</span>
                         </div>
+                        <span class="fill-icon" onclick="fillAll('exp', '${header}', ${index})" title="Tümüne Uygula">⚡</span>
                     </th>
                 `;
             });
@@ -353,6 +378,28 @@
 
             tbody.innerHTML = bodyHTML;
             updateAllTotals();
+        }
+
+        // Hızlı Doldur Fonksiyonu (YENİ EKLENDİ)
+        function fillAll(type, headerName, colIndex = -1) {
+            // Gerçek başlık adını ekrandan da çekebiliriz (güncellendiyse diye) ama parametre de yeterli.
+            const val = prompt(`Tüm aylar için "${headerName}" sütununa yazılacak ortak değeri girin:\n(Örn: 25000)`, "");
+            
+            if (val !== null && val.trim() !== "") {
+                const numVal = Number(val);
+                if (!isNaN(numVal)) {
+                    currentData.rows.forEach(row => {
+                        if (type === 'inc1') row.inc1 = numVal;
+                        else if (type === 'inc2') row.inc2 = numVal;
+                        else if (type === 'exp') row.exps[colIndex] = numVal;
+                    });
+                    renderTable();
+                    scrapeAndSave();
+                    showToast("✅ Tüm aylara uygulandı!");
+                } else {
+                    alert("Lütfen sadece rakam girin.");
+                }
+            }
         }
 
         function scrapeAndSave() {
@@ -462,11 +509,12 @@
 
         function manualSave() {
             scrapeAndSave();
-            showToast();
+            showToast("✅ Başarıyla Kaydedildi!");
         }
 
-        function showToast() {
+        function showToast(message) {
             const toast = document.getElementById("toast");
+            toast.innerText = message;
             toast.classList.add("show");
             setTimeout(() => { toast.classList.remove("show"); }, 2000);
         }
