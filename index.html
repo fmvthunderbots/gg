@@ -105,7 +105,7 @@
         .total-cell { font-weight: bold; background-color: #f8fafc; white-space: nowrap; padding: 8px 10px; }
 
         input[type="number"] {
-            width: 75px; 
+            width: 85px; /* Sütunlar biraz daha genişletildi */
             background: transparent;
             border: none;
             color: var(--text-color);
@@ -134,11 +134,10 @@
             border-bottom: 1px dashed #cbd5e1;
             outline: none;
             padding: 2px;
-            min-width: 40px;
-            max-width: 80px; 
+            min-width: 45px;
             display: inline-block;
             transition: border-color 0.2s;
-            word-wrap: break-word;
+            white-space: nowrap; /* Yazıların alt satıra geçmesini engeller */
         }
         
         [contenteditable="true"]:focus {
@@ -147,47 +146,69 @@
             border-radius: 4px;
         }
 
+        /* Başlık İçeriği - Hepsi yan yana dizecek Flexbox ayarı */
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px; /* Simgeler arası boşluk */
+            flex-wrap: nowrap; /* Asla alt satıra inme */
+            padding: 4px 2px;
+        }
+
         .delete-btn {
             color: var(--expense-color);
             cursor: pointer;
             font-size: 12px;
             opacity: 0.3;
             transition: opacity 0.2s;
-            margin-right: 4px;
             user-select: none;
         }
         .delete-btn:hover { opacity: 1; }
         
-        .header-content {
+        .fill-icon {
+            cursor: pointer;
+            font-size: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 4px;
-        }
-        
-        .month-cell {
-            text-align: left;
-            display: flex;
-            align-items: center;
-            font-weight: 500;
-            min-width: 65px;
-        }
-
-        /* Hızlı Doldur Şimşek İkonu */
-        .fill-icon {
-            cursor: pointer;
-            font-size: 15px;
-            display: inline-block;
             opacity: 0.5;
             transition: all 0.2s;
-            padding: 2px 6px;
+            padding: 4px;
             border-radius: 4px;
             background-color: #e2e8f0;
+            user-select: none;
         }
         .fill-icon:hover {
             opacity: 1;
             background-color: #cbd5e1;
-            transform: scale(1.1);
+        }
+
+        /* Sürükle Bırak Ayarları */
+        .drag-handle {
+            cursor: grab;
+            color: var(--text-muted);
+            font-size: 14px;
+            opacity: 0.4;
+            user-select: none;
+            display: flex;
+            align-items: center;
+        }
+        .drag-handle:hover { opacity: 1; color: var(--btn-blue); }
+        .draggable-col { cursor: grab; transition: background-color 0.2s; }
+        .draggable-col:active { cursor: grabbing; }
+        .draggable-col.drag-over {
+            background-color: #e2e8f0;
+            border-left: 3px solid var(--btn-blue); /* Sürüklendiğinde nereye düşeceğini gösterir */
+        }
+
+        .month-cell {
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+            min-width: 65px;
         }
 
         .add-col-btn {
@@ -290,7 +311,6 @@
             ]
         };
 
-        // Verileri hafızadan çekiyoruz (Önceki maaş girişleri vb. korunacak)
         let currentData = JSON.parse(localStorage.getItem("budgetDataLightV3")) || defaultData;
 
         const table = document.getElementById("financeTable");
@@ -312,30 +332,42 @@
                 </tr>
                 <tr>
                     <th class="text-income">
-                        Batıkan<br>Maaş<br>
-                        <span class="fill-icon" onclick="fillAll('inc1', 'Batıkan Maaş')" title="Tümüne Uygula">⚡</span>
+                        <div class="header-content">
+                            <span>Batıkan Maaş</span>
+                            <span class="fill-icon" onclick="fillAll('inc1', 'Batıkan Maaş')" title="Tümüne Uygula">🔽</span>
+                        </div>
                     </th>
                     <th class="text-income">
-                        Işıl<br>Maaş<br>
-                        <span class="fill-icon" onclick="fillAll('inc2', 'Işıl Maaş')" title="Tümüne Uygula">⚡</span>
+                        <div class="header-content">
+                            <span>Işıl Maaş</span>
+                            <span class="fill-icon" onclick="fillAll('inc2', 'Işıl Maaş')" title="Tümüne Uygula">🔽</span>
+                        </div>
                     </th>
-                    <th class="text-income total-cell">Toplam<br>Gelir</th>
+                    <th class="text-income total-cell">Toplam Gelir</th>
             `;
             
+            // Sürükle bırak için Drag and Drop özellikleri (draggable="true" ve ondrag eventleri) eklendi
             currentData.expenseHeaders.forEach((header, index) => {
                 headHTML += `
-                    <th class="text-expense">
+                    <th class="text-expense draggable-col" draggable="true" 
+                        ondragstart="dragStart(event, ${index})" 
+                        ondragover="dragOver(event)" 
+                        ondragenter="dragEnter(event, ${index})"
+                        ondragleave="dragLeave(event, ${index})"
+                        ondrop="drop(event, ${index})"
+                        id="col-head-${index}">
                         <div class="header-content">
+                            <span class="drag-handle" title="Tutup Sürükle">⣿</span>
                             <span class="delete-btn" onclick="removeCol(${index})" title="Sütunu Sil">✖</span>
                             <span contenteditable="true" class="exp-header-text">${header}</span>
+                            <span class="fill-icon" onclick="fillAll('exp', '${header}', ${index})" title="Tümüne Uygula">🔽</span>
                         </div>
-                        <span class="fill-icon" onclick="fillAll('exp', '${header}', ${index})" title="Tümüne Uygula">⚡</span>
                     </th>
                 `;
             });
             
             headHTML += `
-                    <th class="text-expense total-cell">Toplam<br>Gider</th>
+                    <th class="text-expense total-cell">Toplam Gider</th>
                     <th style="width: 35px; padding: 4px;">
                         <button class="add-col-btn" onclick="addCol()" title="Yeni Gider Sütunu Ekle">+</button>
                     </th>
@@ -380,9 +412,58 @@
             updateAllTotals();
         }
 
-        // Hızlı Doldur Fonksiyonu (YENİ EKLENDİ)
+        // --- SÜRÜKLE BIRAK (DRAG & DROP) İŞLEMLERİ ---
+        let draggedColIndex = null;
+
+        function dragStart(e, index) {
+            draggedColIndex = index;
+            e.dataTransfer.effectAllowed = 'move';
+            // Tarayıcı uyumluluğu için
+            e.dataTransfer.setData('text/plain', index); 
+        }
+
+        function dragOver(e) {
+            e.preventDefault(); // Sürüklenen öğenin bırakılmasına izin ver
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        }
+
+        function dragEnter(e, index) {
+            e.preventDefault();
+            if (index !== draggedColIndex) {
+                document.getElementById(`col-head-${index}`).classList.add('drag-over');
+            }
+        }
+
+        function dragLeave(e, index) {
+            document.getElementById(`col-head-${index}`).classList.remove('drag-over');
+        }
+
+        function drop(e, index) {
+            e.stopPropagation();
+            document.getElementById(`col-head-${index}`).classList.remove('drag-over');
+            
+            // Eğer sütun farklı bir yere bırakıldıysa
+            if (draggedColIndex !== null && draggedColIndex !== index) {
+                // Başlıkların sırasını güncelle
+                const movedHeader = currentData.expenseHeaders.splice(draggedColIndex, 1)[0];
+                currentData.expenseHeaders.splice(index, 0, movedHeader);
+                
+                // Her bir aydaki (satırdaki) veri sırasını güncelle
+                currentData.rows.forEach(row => {
+                    const movedExp = row.exps.splice(draggedColIndex, 1)[0];
+                    row.exps.splice(index, 0, movedExp);
+                });
+                
+                renderTable();
+                scrapeAndSave();
+            }
+            draggedColIndex = null;
+            return false;
+        }
+
+
         function fillAll(type, headerName, colIndex = -1) {
-            // Gerçek başlık adını ekrandan da çekebiliriz (güncellendiyse diye) ama parametre de yeterli.
             const val = prompt(`Tüm aylar için "${headerName}" sütununa yazılacak ortak değeri girin:\n(Örn: 25000)`, "");
             
             if (val !== null && val.trim() !== "") {
