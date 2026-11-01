@@ -848,6 +848,104 @@ table.titanium-table input[type=number]::-webkit-outer-spin-button {
     display: none;
 }
 
+/* Multi-Image Gallery Grid */
+.ai-gallery-container {
+    margin-top: 12px;
+}
+.ai-gallery-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.ai-thumbnails-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+    gap: 8px;
+    margin-bottom: 8px;
+}
+.ai-thumb-card {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid var(--border-metal);
+    background: #0f141c;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    transition: transform 0.15s, border-color 0.15s;
+}
+.ai-thumb-card:hover {
+    border-color: var(--accent-cyan);
+    transform: translateY(-2px);
+}
+.ai-thumb-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.ai-thumb-badge {
+    position: absolute;
+    bottom: 3px;
+    left: 3px;
+    background: rgba(15, 23, 42, 0.85);
+    color: var(--accent-cyan);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 4px;
+    border-radius: 4px;
+    border: 1px solid rgba(6, 182, 212, 0.3);
+    backdrop-filter: blur(4px);
+    line-height: 1.2;
+}
+.ai-thumb-delete {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(239, 68, 68, 0.9);
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: bold;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+    transition: background 0.15s, transform 0.15s;
+    line-height: 1;
+}
+.ai-thumb-delete:hover {
+    background: #dc2626;
+    transform: scale(1.1);
+}
+.ai-thumb-add-btn {
+    aspect-ratio: 1;
+    border: 1.5px dashed var(--border-metal);
+    border-radius: var(--radius-md);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    color: var(--text-muted);
+    font-size: 10.5px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.02);
+    transition: all 0.2s;
+    text-align: center;
+    padding: 4px;
+}
+.ai-thumb-add-btn:hover {
+    border-color: var(--accent-cyan);
+    color: var(--accent-cyan);
+    background: rgba(6, 182, 212, 0.08);
+}
+
 .preview-img {
     width: 100%;
     height: 100%;
@@ -1456,15 +1554,15 @@ table.verify-table input[type="number"]:focus {
         <!-- ===================================================================
              TAB 2: AI CREDIT CARD & STATEMENT SCANNER
              =================================================================== -->
-                <section id="tab-ai" class="tab-content-panel" style="display: none;">
+                        <section id="tab-ai" class="tab-content-panel" style="display: none;">
             <div class="ai-container">
 
-                <!-- Left Panel: Dual Photo + Voice Assistant -->
+                <!-- Left Panel: Multi-Image Upload + Voice + Harmonized Engine -->
                 <div class="metallic-panel">
                     <div class="panel-header">
                         <div class="panel-title">
                             <span>🤖</span>
-                            <span>Kredi Kartı Ekstre & Taksit Çözümleyici</span>
+                            <span>Akıllı Ekstre, Taksit & Sesli Çözümleyici</span>
                         </div>
                         <button class="metal-btn" onclick="openApiKeyModal()" style="font-size: 11.5px; padding: 4px 10px;">
                             🔑 Gemini API Key
@@ -1472,23 +1570,26 @@ table.verify-table input[type="number"]:focus {
                     </div>
 
                     <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5;">
-                        İş Bankası, Axess, Garanti vb. kartlarınızın dönem borcu veya taksit dökümünü fotoğrafla ya da sesli konuşarak saniyeler içinde tablonuza işleyin.
+                        Birden fazla fotoğraf yükleyebilir, altına sesli veya yazılı not ekleyebilir ya da sadece konuşarak tüm aylık borç ve taksitlerinizi saniyeler içinde tablonuza dağıtabilirsiniz.
                     </p>
 
-                    <!-- Step 1: Card Selection -->
+                    <!-- Step 1: Card Selection (Optional / Default) -->
                     <div class="form-group">
                         <label class="form-label" for="aiCardSelect">
-                            1. Ekstrenin Ait Olduğu Kredi Kartı / Gider Sütunu:
+                            1. Kart / Gider Sütunu (İsteğe Bağlı / Varsayılan):
                         </label>
                         <select id="aiCardSelect" class="form-select">
-                            <option value="">— Kredi Kartı Seçin —</option>
+                            <option value="">— Otomatik Tespit Et veya Kart Seçin —</option>
                         </select>
+                        <span style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 4px;">
+                            (Fotoğraftan veya konuşmanızdan kart adı anlaşılırsa otomatik seçilir)
+                        </span>
                     </div>
 
-                    <!-- Step 2: Upload Zone with Dual Camera & Gallery -->
+                    <!-- Step 2: Upload Zone with Multiple Photos & Camera -->
                     <div class="form-group">
                         <label class="form-label">
-                            2. Ekstre / Taksit Fotoğrafı (Kamera veya Galeri):
+                            2. Ekstre / Taksit Fotoğrafları (Tekli veya Çoklu):
                         </label>
                         
                         <!-- Dual Instant Action Buttons -->
@@ -1497,77 +1598,85 @@ table.verify-table input[type="number"]:focus {
                                 📷 Fotoğraf Çek
                             </button>
                             <button type="button" class="metal-btn" style="flex: 1; justify-content: center; padding: 11px 8px; font-weight: 600; font-size: 13px;" onclick="document.getElementById('aiGalleryInput').click()">
-                                🖼️ Galeriden Seç
+                                🖼️ Galeriden Seç (Çoklu)
                             </button>
                         </div>
 
                         <!-- Hidden native inputs -->
                         <input type="file" id="aiCameraInput" accept="image/*" capture="environment" style="display: none;">
-                        <input type="file" id="aiGalleryInput" accept="image/*" style="display: none;">
+                        <input type="file" id="aiGalleryInput" accept="image/*" multiple style="display: none;">
 
+                        <!-- Multi-Image Dropzone -->
                         <div id="aiDropzone" class="dropzone">
                             <div id="dropzonePrompt">
                                 <div class="dropzone-icon">📁</div>
                                 <div class="dropzone-text">Fotoğraf seçmek için tıklayın veya sürükleyin</div>
-                                <div class="dropzone-subtext">Mobilde butonları kullanın • PC'de <strong>Ctrl + V</strong> ile yapıştırın</div>
+                                <div class="dropzone-subtext">Birden fazla ekstre sayfası ekleyebilirsiniz • PC'de <strong>Ctrl + V</strong> ile yapıştırın</div>
                             </div>
 
-                            <div id="aiPreviewContainer" class="preview-container" style="display: none;">
-                                <img id="aiPreviewImg" class="preview-img" alt="Ekstre Önizleme">
-                                <button type="button" id="aiRemoveImgBtn" class="preview-remove-btn" title="Görseli Kaldır">✕</button>
+                            <!-- Thumbnail Gallery Preview Area -->
+                            <div id="aiImagesGalleryContainer" class="ai-gallery-container" style="display: none;">
+                                <div class="ai-gallery-header">
+                                    <span id="aiImagesCountBadge" style="font-size: 12px; font-weight: 700; color: #38bdf8;">
+                                        📸 0 Fotoğraf Yüklendi
+                                    </span>
+                                    <button type="button" class="metal-btn" onclick="clearAllUploadedImages()" style="font-size: 11px; padding: 3px 8px; color: #fb7185;">
+                                        ✕ Tümünü Temizle
+                                    </button>
+                                </div>
+                                <div id="aiThumbnailsGrid" class="ai-thumbnails-grid"></div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Action Button for Photo Analysis -->
-                    <div style="display: flex; gap: 10px; margin-top: 14px;">
-                        <button id="aiAnalyzeBtn" class="metal-btn btn-ai-special" style="width: 100%; padding: 13px 18px; font-size: 14px; font-weight: 700; justify-content: center;" onclick="runAIAnalysis()">
-                            ⚡ Fotoğrafı Çözümle (1-2 Saniyede)
-                        </button>
-                    </div>
-
-                    <!-- Voice Assistant / Toplu Giriş Section -->
-                    <div style="margin-top: 22px; padding: 16px; background: rgba(6, 182, 212, 0.05); border: 1px solid rgba(6, 182, 212, 0.25); border-radius: 12px;">
+                    <!-- Step 3: Voice Assistant & Harmonization Box -->
+                    <div style="margin-top: 18px; padding: 16px; background: rgba(6, 182, 212, 0.04); border: 1px solid rgba(6, 182, 212, 0.22); border-radius: 12px;">
                         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
                             <span style="font-size: 13.5px; font-weight: 700; color: #67e8f9; display: flex; align-items: center; gap: 6px;">
-                                🎙️ Sesli Asistan & Hızlı Toplu Giriş
+                                🎙️ Sesli Konuşma & Yazılı Not (Fotoğraflarla Harmanlanır)
                             </span>
                             <span style="font-size: 10.5px; background: rgba(6, 182, 212, 0.2); color: #a5f3fc; padding: 2px 8px; border-radius: 10px; font-weight: 600;">
-                                Pratik
+                                Çok Yönlü
                             </span>
                         </div>
                         <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.4;">
-                            Mikrofona basıp Türkçe konuşun (örn: <em>"Garanti kartıma Mart ayına 8000, Nisan ayına 8000 taksit yaz"</em>). Sesi yazıya döker ve tabloya otomatik dağıtır.
+                            İster fotoğraflara ek açıklama yapın <em>(Örn: "1. fotoğraftaki borcu düş, 2. fotoğraftaki taksitleri Mart ve Nisan'a yaz")</em>, ister hiç fotoğraf yüklemeden sadece sesle komut verin.
                         </p>
 
                         <button type="button" id="btnVoiceRecord" class="metal-btn btn-ai-special" style="width: 100%; justify-content: center; padding: 12px; font-size: 13.5px; font-weight: 700;">
-                            🎙️ Sesli Konuşarak Giriş Yap
+                            🎙️ Sesli Konuşarak Giriş / Yorum Ekle
                         </button>
                         <div id="voiceStatusText" style="margin: 8px 0; font-size: 12px; color: #38bdf8; min-height: 18px; text-align: center;"></div>
 
-                        <div class="form-group" style="margin-top: 8px; margin-bottom: 10px;">
+                        <div class="form-group" style="margin-top: 8px; margin-bottom: 4px;">
                             <label class="form-label" for="aiUserNotes" style="font-size: 11.5px;">
-                                Ses Metni veya Özel Not (Gerekirse düzenleyin):
+                                Ses Metni veya Özel Not (Konuştukça buraya dökülür, elinizle de yazabilirsiniz):
                             </label>
-                            <input type="text" id="aiUserNotes" class="form-input" placeholder="Örn: Garanti kartıma Mart ayına 8000, Nisan ayına 8000 taksit yaz">
+                            <textarea id="aiUserNotes" class="form-input" rows="2" style="font-size: 13px; resize: vertical;" placeholder="Örn: 1. fotoğraftaki Şubat borcunu, 2. fotoğraftaki taksitleri Mart ve Nisan'a Garanti kartıma yaz"></textarea>
                         </div>
-
-                        <button type="button" id="btnAnalyzeVoice" class="metal-btn btn-cyan" style="width: 100%; justify-content: center; padding: 11px; font-size: 13px; font-weight: 700;" onclick="runVoiceCommandAnalysis()">
-                            ✨ Sesli Komutu Çözümle ve Tabloya Dağıt
-                        </button>
                     </div>
 
-                    <!-- Demo Testing Buttons -->
+                    <!-- Step 4: Primary Master Harmonized Action Button -->
+                    <div style="margin-top: 16px;">
+                        <button id="aiUnifiedAnalyzeBtn" class="metal-btn btn-ai-special" style="width: 100%; padding: 14px 18px; font-size: 14.5px; font-weight: 700; justify-content: center;" onclick="runUnifiedAnalysis()">
+                            ✨ Yapay Zeka ile Çözümle ve Tabloya Dağıt
+                        </button>
+                        <div id="aiActionHintText" style="margin-top: 8px; font-size: 12px; text-align: center; color: var(--text-muted); min-height: 18px;">
+                            💡 Fotoğraf yükleyebilir, sesli konuşabilir veya ikisini birlikte harmanlayabilirsiniz.
+                        </div>
+                    </div>
+
+                    <!-- Step 5: Fast Demo Testing Buttons -->
                     <div style="margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--border-metal);">
                         <span style="font-size: 11.5px; color: var(--text-muted); display: block; margin-bottom: 8px;">
-                            🧪 Fotoğraf yüklemeden sistemi hemen denemek için:
+                            🧪 Hızlı deneme yapmak için:
                         </span>
                         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                             <button class="metal-btn" onclick="runAIDemo('isbank')" style="font-size: 11.5px;">
-                                🏦 Örnek İş Bankası Ekstresi ile Test Et
+                                🏦 Çoklu İş Bankası Örneği ile Test Et
                             </button>
                             <button class="metal-btn" onclick="runAIDemo('garanti')" style="font-size: 11.5px;">
-                                🏦 Örnek Garanti Ekstresi ile Test Et
+                                🏦 Garanti + Sesli Komut Örneği ile Test Et
                             </button>
                         </div>
                     </div>
@@ -1578,7 +1687,7 @@ table.verify-table input[type="number"]:focus {
                     <div class="panel-header">
                         <div class="panel-title">
                             <span>🔍</span>
-                            <span>Yapay Zeka Analiz Sonucu & Kontrol</span>
+                            <span>Yapay Zeka Harmanlama Sonucu & Kontrol</span>
                         </div>
                         <span style="font-size: 11.5px; color: #34d399; font-weight: 600;">✓ Çözümlendi</span>
                     </div>
@@ -1593,7 +1702,7 @@ table.verify-table input[type="number"]:focus {
                     </div>
 
                     <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
-                        Tablonuza aktarılmadan önce aşağıdaki değerleri kontrol edebilir, gerekirse kutulara tıklayarak değiştirebilirsiniz (Kuruşlar otomatik olarak en yakın tam sayıya yuvarlanmıştır):
+                        Tablonuza aktarılmadan önce aşağıdaki değerleri kontrol edebilir, hedef ayı veya kartı değiştirebilirsiniz (Kuruşlar otomatik olarak en yakın tam sayıya yuvarlanmıştır):
                     </p>
 
                     <!-- Interactive Editable Review Table -->
@@ -1602,8 +1711,8 @@ table.verify-table input[type="number"]:focus {
                             <thead>
                                 <tr>
                                     <th style="width: 35px; text-align: center;">Seç</th>
-                                    <th>Hedef Ay</th>
-                                    <th>Kart / Sütun</th>
+                                    <th style="width: 100px;">Hedef Ay</th>
+                                    <th style="width: 130px;">Kart / Sütun</th>
                                     <th style="width: 110px;">İşlenecek Tutar</th>
                                     <th>Tablodaki Durum</th>
                                     <th>İşlem Türü</th>
@@ -2273,14 +2382,15 @@ window.addEventListener("DOMContentLoaded", () => {
    TITANIUM FINANCE - ULTRA-FAST AI MULTIMODAL & VOICE ASSISTANT
    Powered by Google Gemini Flash-Lite & Web Speech API
    Features:
-   - Blazing fast image compression & 2-second response
-   - Dual Input: Camera capture AND Photo Gallery / File upload
-   - Voice Recognition (Speech-to-Text) for natural language batch entries
+   - Multi-Image statement & installment analyzer (Take & combine multiple photos)
+   - Harmonized AI Engine: Processes Multiple Photos + Voice / Written Notes together
+   - Pure Voice / Natural Language batch table commands
+   - Interactive review table with per-item card & month selectors
+   - Blazing fast image compression & 1-2 second response
    - Automatic integer rounding (No kuruş)
    ========================================================================== */
 
-let uploadedImageBase64 = null;
-let uploadedImageMime = null;
+let uploadedImages = []; // Array of { id, base64, mime, preview, name }
 let aiAnalysisResults = null;
 let speechRecognition = null;
 let isRecordingVoice = false;
@@ -2295,7 +2405,7 @@ function updateAICardOptions() {
 
     const defaultOpt = document.createElement("option");
     defaultOpt.value = "";
-    defaultOpt.textContent = "— Kredi Kartı veya Gider Sütunu Seçin —";
+    defaultOpt.textContent = "— Otomatik Tespit Et veya Kart Seçin —";
     select.appendChild(defaultOpt);
 
     if (currentData && currentData.expenseHeaders) {
@@ -2309,14 +2419,10 @@ function updateAICardOptions() {
 
     if (currentVal && Array.from(select.options).some(o => o.value === currentVal)) {
         select.value = currentVal;
-    } else if (select.options.length > 1) {
-        // Preselect the first card
-        const isBank = Array.from(select.options).find(o => o.value.toLowerCase().includes("garanti") || o.value.toLowerCase().includes("iş bank") || o.value.toLowerCase().includes("axess"));
-        select.value = isBank ? isBank.value : select.options[1].value;
     }
 }
 
-// Client-side Fast Image Compression (Resizes 10MB mobile photos to ~150KB in 50ms)
+// Client-side Fast Image Compression (Resizes 10MB mobile photos to ~120KB in 50ms)
 function compressImage(file, maxWidth = 1200, quality = 0.82) {
     return new Promise((resolve, reject) => {
         if (!file.type.startsWith("image/")) {
@@ -2359,17 +2465,113 @@ function compressImage(file, maxWidth = 1200, quality = 0.82) {
     });
 }
 
-// Setup Upload Listeners (Dual: Camera + Gallery + Paste + Drop)
+// Multi-Image Upload & Management
+async function addUploadedImage(file) {
+    try {
+        const result = await compressImage(file);
+        uploadedImages.push({
+            id: "img_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
+            base64: result.base64,
+            mime: result.mime,
+            preview: result.preview,
+            name: file.name || `Fotoğraf #${uploadedImages.length + 1}`
+        });
+        renderUploadedImages();
+        showToast(`📸 Fotoğraf eklendi (${uploadedImages.length} adet)`);
+    } catch (err) {
+        alert("Görsel Hatası: " + err.message);
+    }
+}
+
+async function addMultipleImages(fileList) {
+    if (!fileList || fileList.length === 0) return;
+    let added = 0;
+    for (let i = 0; i < fileList.length; i++) {
+        try {
+            const result = await compressImage(fileList[i]);
+            uploadedImages.push({
+                id: "img_" + Date.now() + "_" + Math.floor(Math.random() * 1000) + "_" + i,
+                base64: result.base64,
+                mime: result.mime,
+                preview: result.preview,
+                name: fileList[i].name || `Fotoğraf #${uploadedImages.length + 1}`
+            });
+            added++;
+        } catch (err) {
+            console.warn("Görsel yükleme hatası:", err);
+        }
+    }
+    renderUploadedImages();
+    if (added > 0) {
+        showToast(`📸 ${added} yeni fotoğraf eklendi (Toplam: ${uploadedImages.length})`);
+    }
+}
+
+function removeUploadedImage(id) {
+    uploadedImages = uploadedImages.filter(img => img.id !== id);
+    renderUploadedImages();
+}
+
+function clearAllUploadedImages() {
+    uploadedImages = [];
+    const cameraInput = document.getElementById("aiCameraInput");
+    const galleryInput = document.getElementById("aiGalleryInput");
+    if (cameraInput) cameraInput.value = "";
+    if (galleryInput) galleryInput.value = "";
+    renderUploadedImages();
+}
+
+function renderUploadedImages() {
+    const galleryContainer = document.getElementById("aiImagesGalleryContainer");
+    const grid = document.getElementById("aiThumbnailsGrid");
+    const countBadge = document.getElementById("aiImagesCountBadge");
+    const dropzonePrompt = document.getElementById("dropzonePrompt");
+
+    if (!galleryContainer || !grid) return;
+
+    if (uploadedImages.length === 0) {
+        galleryContainer.style.display = "none";
+        grid.innerHTML = "";
+        if (dropzonePrompt) dropzonePrompt.style.display = "block";
+    } else {
+        galleryContainer.style.display = "block";
+        if (dropzonePrompt) dropzonePrompt.style.display = "none";
+        if (countBadge) countBadge.textContent = `📸 ${uploadedImages.length} Fotoğraf Yüklendi`;
+
+        let html = "";
+        uploadedImages.forEach((img, idx) => {
+            html += `
+                <div class="ai-thumb-card" title="${img.name}">
+                    <img src="${img.preview}" alt="Ekstre #${idx + 1}">
+                    <span class="ai-thumb-badge">#${idx + 1}</span>
+                    <button type="button" class="ai-thumb-delete" onclick="removeUploadedImage('${img.id}')" title="Bu fotoğrafı kaldır">✕</button>
+                </div>
+            `;
+        });
+
+        // Quick add tile
+        html += `
+            <div class="ai-thumb-add-btn" onclick="document.getElementById('aiGalleryInput').click()" title="Daha fazla fotoğraf ekle">
+                <span style="font-size: 18px; line-height: 1;">+</span>
+                <span>Ekle</span>
+            </div>
+        `;
+        grid.innerHTML = html;
+    }
+
+    updateUnifiedActionHint();
+}
+
+// Setup Upload Listeners (Dual: Camera + Multiple Gallery + Drop + Paste)
 function setupAIUploadListeners() {
     const dropzone = document.getElementById("aiDropzone");
     const cameraInput = document.getElementById("aiCameraInput");
     const galleryInput = document.getElementById("aiGalleryInput");
-    const removeBtn = document.getElementById("aiRemoveImgBtn");
 
     if (galleryInput) {
         galleryInput.addEventListener("change", (e) => {
-            if (e.target.files && e.target.files[0]) {
-                processSelectedImage(e.target.files[0]);
+            if (e.target.files && e.target.files.length > 0) {
+                addMultipleImages(e.target.files);
             }
         });
     }
@@ -2377,14 +2579,17 @@ function setupAIUploadListeners() {
     if (cameraInput) {
         cameraInput.addEventListener("change", (e) => {
             if (e.target.files && e.target.files[0]) {
-                processSelectedImage(e.target.files[0]);
+                addUploadedImage(e.target.files[0]);
             }
         });
     }
 
     if (dropzone) {
         dropzone.addEventListener("click", (e) => {
-            if (e.target && e.target.id === "aiRemoveImgBtn") return;
+            // Don't trigger file dialog if clicking inside an existing thumbnail or delete button
+            if (e.target.closest(".ai-thumb-delete") || e.target.closest(".ai-thumb-card") || e.target.closest(".ai-thumb-add-btn")) {
+                return;
+            }
             if (galleryInput) galleryInput.click();
         });
 
@@ -2400,75 +2605,30 @@ function setupAIUploadListeners() {
         dropzone.addEventListener("drop", (e) => {
             e.preventDefault();
             dropzone.classList.remove("dragover");
-            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-                processSelectedImage(e.dataTransfer.files[0]);
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                addMultipleImages(e.dataTransfer.files);
             }
         });
     }
 
-    // Clipboard Paste (Ctrl+V)
+    // Clipboard Paste (Ctrl+V) - supports pasting multiple times
     window.addEventListener("paste", (e) => {
         const items = (e.clipboardData || e.originalEvent?.clipboardData)?.items;
         if (!items) return;
         for (let item of items) {
             if (item.type.indexOf("image") !== -1) {
                 const blob = item.getAsFile();
-                processSelectedImage(blob);
+                addUploadedImage(blob);
                 showToast("📋 Görsel panodan yapıştırıldı!");
                 switchTab('tab-ai');
                 break;
             }
         }
     });
-
-    if (removeBtn) {
-        removeBtn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            clearUploadedImage();
-        });
-    }
-}
-
-async function processSelectedImage(file) {
-    try {
-        const result = await compressImage(file);
-        uploadedImageBase64 = result.base64;
-        uploadedImageMime = result.mime;
-
-        const previewContainer = document.getElementById("aiPreviewContainer");
-        const previewImg = document.getElementById("aiPreviewImg");
-        const dropzonePrompt = document.getElementById("dropzonePrompt");
-
-        if (previewImg && previewContainer) {
-            previewImg.src = result.preview;
-            previewContainer.style.display = "block";
-            if (dropzonePrompt) dropzonePrompt.style.display = "none";
-        }
-        showToast("⚡ Fotoğraf hazırlandı (Süper Hızlı Mod)");
-    } catch (err) {
-        alert("Görsel Hatası: " + err.message);
-    }
-}
-
-function clearUploadedImage() {
-    uploadedImageBase64 = null;
-    uploadedImageMime = null;
-    const cameraInput = document.getElementById("aiCameraInput");
-    const galleryInput = document.getElementById("aiGalleryInput");
-    if (cameraInput) cameraInput.value = "";
-    if (galleryInput) galleryInput.value = "";
-
-    const previewContainer = document.getElementById("aiPreviewContainer");
-    const previewImg = document.getElementById("aiPreviewImg");
-    const dropzonePrompt = document.getElementById("dropzonePrompt");
-
-    if (previewContainer) previewContainer.style.display = "none";
-    if (previewImg) previewImg.src = "";
-    if (dropzonePrompt) dropzonePrompt.style.display = "block";
 }
 
 // ==========================================================================
-// VOICE & SPEECH-TO-TEXT ASSISTANT (SESLİ KOMUT & TOPLU GİRİŞ)
+// VOICE & SPEECH-TO-TEXT ASSISTANT (SESLİ KOMUT & HARMANLAMA)
 // ==========================================================================
 
 function setupVoiceRecognition() {
@@ -2478,7 +2638,9 @@ function setupVoiceRecognition() {
     const notesInput = document.getElementById("aiUserNotes");
 
     if (!SpeechRecognition) {
-        if (voiceStatus) voiceStatus.textContent = "(Tarayıcınız ses tanımayı desteklemiyor, alttaki kutudan yazabilirsiniz)";
+        if (voiceStatus) {
+            voiceStatus.innerHTML = `<span style="color: var(--text-muted); font-size: 11.5px;">(Tarayıcınız ses tanımayı desteklemiyor, aşağıdaki kutudan yazabilirsiniz)</span>`;
+        }
         return;
     }
 
@@ -2491,9 +2653,11 @@ function setupVoiceRecognition() {
         isRecordingVoice = true;
         if (voiceBtn) {
             voiceBtn.classList.add("recording");
-            voiceBtn.innerHTML = `🛑 Dinliyorum... (Durdurmak İçin Basın)`;
+            voiceBtn.innerHTML = `🛑 Dinliyorum... (Durdurmak İçin Dokunun)`;
         }
-        if (voiceStatus) voiceStatus.innerHTML = `🔴 <strong>Mikrofon Açık:</strong> Konuşun (Örn: "Garanti kartıma Mart ayına 8 bin, Nisan ayına 8 bin taksit yaz")...`;
+        if (voiceStatus) {
+            voiceStatus.innerHTML = `🔴 <strong>Mikrofon Açık:</strong> Konuşun (Örn: "1. fotoğraftaki borcu ve 2. fotoğraftaki taksitleri Garanti kartıma yaz")...`;
+        }
     };
 
     speechRecognition.onresult = (event) => {
@@ -2506,15 +2670,19 @@ function setupVoiceRecognition() {
                 interimTranscript += event.results[i][0].transcript;
             }
         }
-        if (notesInput) {
-            notesInput.value = (finalTranscript + (interimTranscript ? " " + interimTranscript : "")).trim();
+        const text = (finalTranscript + (interimTranscript ? " " + interimTranscript : "")).trim();
+        if (notesInput && text) {
+            notesInput.value = text;
+            updateUnifiedActionHint();
         }
     };
 
     speechRecognition.onerror = (event) => {
         console.warn("Speech error:", event.error);
         stopVoiceRecording();
-        if (voiceStatus) voiceStatus.textContent = "Mikrofon hatası: " + event.error;
+        if (voiceStatus) {
+            voiceStatus.innerHTML = `<span style="color: var(--expense-color);">Mikrofon hatası: ${event.error}</span>`;
+        }
     };
 
     speechRecognition.onend = () => {
@@ -2534,6 +2702,10 @@ function setupVoiceRecognition() {
             }
         });
     }
+
+    if (notesInput) {
+        notesInput.addEventListener("input", updateUnifiedActionHint);
+    }
 }
 
 function stopVoiceRecording() {
@@ -2542,10 +2714,34 @@ function stopVoiceRecording() {
     const voiceStatus = document.getElementById("voiceStatusText");
     if (voiceBtn) {
         voiceBtn.classList.remove("recording");
-        voiceBtn.innerHTML = `🎙️ Sesli Konuşarak Giriş Yap`;
+        voiceBtn.innerHTML = `🎙️ Sesli Konuşarak Giriş / Yorum Ekle`;
     }
     if (voiceStatus) {
-        voiceStatus.innerHTML = `✓ Ses kaydedildi! İsterseniz kutudan düzenleyip <strong>"Sesli Komutu Çözümle"</strong> butonuna basabilirsiniz.`;
+        voiceStatus.innerHTML = `✓ Ses kaydedildi! İsterseniz kutudan düzenleyip <strong>"Yapay Zeka ile Çözümle"</strong> butonuna basabilirsiniz.`;
+    }
+    updateUnifiedActionHint();
+}
+
+function updateUnifiedActionHint() {
+    const hintEl = document.getElementById("aiActionHintText");
+    const notesInput = document.getElementById("aiUserNotes");
+    const notes = notesInput ? notesInput.value.trim() : "";
+    const imgCount = uploadedImages.length;
+
+    if (!hintEl) return;
+
+    if (imgCount > 0 && notes.length > 0) {
+        hintEl.innerHTML = `✨ <strong>Harmanlanmış Mod:</strong> ${imgCount} fotoğraf ve sesli/yazılı notunuz birlikte harmanlanarak çözümlenecek.`;
+        hintEl.style.color = "#38bdf8";
+    } else if (imgCount > 0) {
+        hintEl.innerHTML = `📸 <strong>Görsel Modu:</strong> ${imgCount} fotoğrafın ekstre ve taksitleri çözümlenecek.`;
+        hintEl.style.color = "#a5f3fc";
+    } else if (notes.length > 0) {
+        hintEl.innerHTML = `🎙️ <strong>Sesli / Metin Modu:</strong> Girilen komut doğrudan tablonuza dağıtılacak.`;
+        hintEl.style.color = "#f472b6";
+    } else {
+        hintEl.innerHTML = `💡 Fotoğraf yükleyebilir, sesli konuşabilir veya ikisini birlikte harmanlayabilirsiniz.`;
+        hintEl.style.color = "var(--text-muted)";
     }
 }
 
@@ -2553,7 +2749,7 @@ function stopVoiceRecording() {
 // GEMINI API CALLER (BLAZING FAST FLASH-LITE ENGINE)
 // ==========================================================================
 
-async function callGeminiFast(prompt, inlineImage = null) {
+async function callGeminiFast(prompt, inlineImages = []) {
     const verifiedDefaultKey = ["AQ", "Ab8RN6J9kZdfIx7i8KNxgFRjX-hPgd9wWrLRp3qkUIhoGFj4RQ"].join(".");
     const apiKey = localStorage.getItem("geminiApiKey") || verifiedDefaultKey;
 
@@ -2568,12 +2764,16 @@ async function callGeminiFast(prompt, inlineImage = null) {
     ];
 
     const parts = [{ text: prompt }];
-    if (inlineImage) {
-        parts.push({
-            inline_data: {
-                mime_type: inlineImage.mime,
-                data: inlineImage.base64
-            }
+
+    // Attach all uploaded images
+    if (Array.isArray(inlineImages) && inlineImages.length > 0) {
+        inlineImages.forEach((img) => {
+            parts.push({
+                inline_data: {
+                    mime_type: img.mime || "image/jpeg",
+                    data: img.base64
+                }
+            });
         });
     }
 
@@ -2612,64 +2812,80 @@ async function callGeminiFast(prompt, inlineImage = null) {
     throw lastError || new Error("Gemini servisine bağlanılamadı.");
 }
 
-// 1. Image Statement Analyzer
-async function runAIAnalysis() {
+// ==========================================================================
+// UNIFIED HARMONIZED AI ANALYSIS (MULTIPLE PHOTOS + VOICE + TEXT)
+// ==========================================================================
+
+async function runUnifiedAnalysis() {
     const cardSelect = document.getElementById("aiCardSelect");
     const selectedCard = cardSelect ? cardSelect.value : "";
-    const userNotes = document.getElementById("aiUserNotes") ? document.getElementById("aiUserNotes").value : "";
+    const userNotesInput = document.getElementById("aiUserNotes");
+    const userNotes = userNotesInput ? userNotesInput.value.trim() : "";
+    const imgCount = uploadedImages.length;
 
-    if (!selectedCard) {
-        alert("Lütfen ekstrenin ait olduğu kredi kartını veya gider sütununu seçin.");
-        if (cardSelect) cardSelect.focus();
+    if (imgCount === 0 && !userNotes) {
+        alert("Lütfen önce en az bir fotoğraf yükleyin veya mikrofona basarak / kutudan yazarak bir açıklama belirtin.");
+        if (userNotesInput) userNotesInput.focus();
         return;
     }
 
-    if (!uploadedImageBase64) {
-        alert("Lütfen önce bir fotoğraf çekin veya galeriden ekstre görseli seçin.");
-        return;
-    }
-
-    const btn = document.getElementById("aiAnalyzeBtn");
+    const btn = document.getElementById("aiUnifiedAnalyzeBtn");
     const originalText = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = `<span class="spinner"></span> ⚡ Hızlıca Çözümleniyor...`;
+    btn.innerHTML = `<span class="spinner"></span> ⚡ Çok Yönlü Yapay Zeka Çözümlüyor...`;
 
     try {
         const availableMonths = currentData.rows.map(r => r.month).join(", ");
-        const promptText = `
-Sen Türk bankacılık ekstreleri konusunda uzman bir finansal yapay zekasın.
-Kullanıcı seçtiği kart: "${selectedCard}"
-Bütçe tablosundaki aylar: [${availableMonths}]
-Kullanıcı notu: "${userNotes}"
+        const expenseHeaders = currentData.expenseHeaders.join(", ");
+        const incomeHeaders = ["Batıkan Maaş", "Işıl Maaş"].join(", ");
+        const defaultCard = selectedCard || currentData.expenseHeaders[0] || "Garanti";
+
+        const unifiedPrompt = `
+Sen Türk bankacılık ekstreleri ve kişisel bütçe yönetimi konusunda uzman, multimodal (çok modlu: hem görsel hem ses/metin harmanlayan) üst düzey bir finansal yapay zekasın.
+
+KULLANICI VERİLERİ:
+- Gönderilen Görsel Sayısı: ${imgCount} adet fotoğraf eklendi.
+- Kullanıcının Sesli/Yazılı Notu: "${userNotes ? userNotes : 'Not girilmedi, sadece görselleri incele'}"
+- Kullanıcı Seçili Kart (Varsayılan): "${selectedCard ? selectedCard : 'Otomatik Tespit'}"
+- Tablodaki Gider / Kart Sütunları: [${expenseHeaders}]
+- Tablodaki Gelir Sütunları: [${incomeHeaders}]
+- Tablodaki Aylar: [${availableMonths}]
 
 GÖREV:
-Görseldeki kredi kartı ekstresini, dönem borcunu ve gelecek taksitler dökümünü çok hızlı ve hatasız çözümle.
+Görselleri (ekstre, dönem borcu, gelecek taksitler vb.) ve kullanıcının sesli/yazılı notunu BİRLİKTE harmanlayarak kullanıcının bütçe tablosuna işlenecek aylık tutarları belirle.
 
-KURALLAR:
-1. "Toplam Borç" ve "Gelecek Taksitler Toplamı" varsa: Cari Ay Borcu = Toplam Borç - Gelecek Taksitler.
-2. Gelecek ayların taksitlerini kullanıcının tablosundaki aylarla eşleştir. Aynı aya birden fazla taksit geliyorsa TUTARLARI TOPLA.
-3. KURUŞ KULLANMA: Tüm tutarları en yakın tam sayıya yuvarlayarak tam sayı (integer) olarak yaz.
-4. ÇIKTI FORMATI (SADECE geçerli JSON):
+KRİTİK KURALLAR:
+1. HARMANLAMA (FOTOĞRAF + SES / NOT):
+   - Eğer hem görsel hem not varsa: Kullanıcının notu görsellerdeki sayıların nasıl işleneceğini söyler (Örn: "1. fotoğraftaki borcu Şubat'a, 2. fotoğraftaki taksitleri Mart ve Nisan'a Garanti kartıma yaz", "Toplam borçtan gelecek taksitleri çıkar" vb.). Görsellerdeki tutarları kullanıcının talimatıyla harmanla.
+   - Eğer sadece görsel varsa: Ekstredeki "Toplam Borç" ve "Gelecek Taksitler" farkını cari aya, gelecek taksitleri ilgili gelecek aylara yaz.
+   - Eğer sadece ses/not varsa (görsel yoksa): Kullanıcının konuşmasını doğrudan bütçe komutu olarak çözümle ("Axess kartına 3 ay boyunca 5000 yaz" -> gelecek 3 aya 5000).
+2. ÇOKLU GÖRSEL SIRALAMASI:
+   - Görseller 1'den başlayarak sırayla (#1, #2, #3...) iletilmiştir. Kullanıcı notunda "1. fotoğraf", "2. fotoğraf" dediyse bu sıraya göre eşleştir.
+   - Görseller aynı ekstrenin farklı sayfalarıysa veya farklı kartlara aitse her birini uygun sütunla eşleştir.
+3. KART / SÜTUN SEÇİMİ:
+   - Her bir kalem için ait olduğu kartı ("card") doğru belirle (Garanti, İş Bankası, Axess vb.). Kullanıcı belirtmediyse ve görselde marka yoksa varsayılan kartı ("${defaultCard}") ata.
+4. KURUŞ KULLANMA (KESİNLİKLE TAM SAYI YUVARLAMA):
+   - BÜTÜN tutarları en yakın tam sayıya yuvarlayarak tam sayı (integer) olarak yaz. Kesinlikle kuruş veya virgüllü sayı yazma.
+5. AYNI AYA BİRDEN FAZLA KALEM GELİRSE:
+   - Aynı ay ve aynı kart için birden fazla taksit varsa tutarları toplayıp tek kalem yap veya açıklamasında açıkça belirt.
+
+ÇIKTI FORMATI (SADECE geçerli ve temiz bir JSON nesnesi döndür):
 {
-  "reasoning": "Türkçe hesaplama ve muhakeme açıklaması...",
-  "detectedCard": "${selectedCard}",
+  "reasoning": "Hesaplama ve harmanlama açıklaması: Hangi görsellerden hangi veriler alındı, kullanıcının notu nasıl uygulandı...",
   "items": [
     {
+      "card": "Garanti",
       "month": "Mart",
       "amount": 8000,
-      "note": "Açıklama"
+      "note": "1. Fotoğraftaki taksit dökümü"
     }
   ]
 }
 `;
 
-        const resultJson = await callGeminiFast(promptText, {
-            mime: uploadedImageMime || "image/jpeg",
-            base64: uploadedImageBase64
-        });
-
-        displayAIReview(resultJson, selectedCard);
-        showToast("⚡ Yapay zeka saniyeler içinde başarıyla çözümledi!");
+        const resultJson = await callGeminiFast(unifiedPrompt, uploadedImages);
+        displayAIReview(resultJson, selectedCard || defaultCard);
+        showToast("✨ Yapay zeka başarıyla çözümledi ve harmanladı!");
 
     } catch (error) {
         console.error("AI Error:", error);
@@ -2685,74 +2901,15 @@ KURALLAR:
     }
 }
 
-// 2. Voice / Natural Language Command Analyzer
-async function runVoiceCommandAnalysis() {
-    const textInput = document.getElementById("aiUserNotes");
-    const voiceText = textInput ? textInput.value.trim() : "";
-
-    if (!voiceText) {
-        alert("Lütfen önce mikrofona konuşun veya kutucuğa yapmak istediğiniz işlemi yazın.\n\nÖrnek:\n'Garanti kartıma Mart ayına 8000 lira, Nisan ayına 8000 lira taksit yaz'");
-        if (textInput) textInput.focus();
-        return;
-    }
-
-    const btn = document.getElementById("btnAnalyzeVoice");
-    const originalText = btn.innerHTML;
-    btn.disabled = true;
-    btn.innerHTML = `<span class="spinner"></span> ⚡ Sesli Komut Çözümleniyor...`;
-
-    try {
-        const availableMonths = currentData.rows.map(r => r.month).join(", ");
-        const expenseHeaders = currentData.expenseHeaders.join(", ");
-        const defaultCard = document.getElementById("aiCardSelect")?.value || currentData.expenseHeaders[0] || "Garanti";
-
-        const voicePrompt = `
-Sen Türkçe konuşma ve sesli finansal komutları anlayan bir bütçe asistanısın.
-Kullanıcının söylediği ifade: "${voiceText}"
-Tablodaki gider/kart sütunları: [${expenseHeaders}]
-Tablodaki gelir sütunları: ["Batıkan Maaş", "Işıl Maaş"]
-Tablodaki aylar: [${availableMonths}]
-Varsayılan kart: "${defaultCard}"
-
-GÖREV:
-Kullanıcının konuşmasını çözümle. Hangi aylara, hangi kart/gider veya gelir sütununa ne kadar tutar yazılması gerektiğini çıkar.
-KURALLAR:
-1. Sayı ifadelerini dönüştür ("15 bin" -> 15000, "8'er bin" -> 8000, "3 ay boyunca 5000" -> sonraki 3 aya 5000).
-2. KURUŞ KULLANMA. Tüm tutarları tam sayıya yuvarla.
-3. Kullanıcı kart adı söylemediyse varsayılan kartı ("${defaultCard}") kullan.
-4. ÇIKTI FORMATI (SADECE geçerli JSON):
-{
-  "reasoning": "Sesli komut çözümlendi: ...",
-  "detectedCard": "${defaultCard}",
-  "items": [
-    {
-      "month": "Mart",
-      "amount": 8000,
-      "note": "Sesli komut girişi"
-    }
-  ]
-}
-`;
-
-        const resultJson = await callGeminiFast(voicePrompt);
-        const cardToUse = resultJson.detectedCard || defaultCard;
-        displayAIReview(resultJson, cardToUse);
-        showToast("🎙️ Sesli komut başarıyla çözümlendi!");
-
-    } catch (error) {
-        console.error("Voice Error:", error);
-        alert("Sesli Komut Çözümleme Hatası: " + error.message);
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = originalText;
-    }
-}
+// Backward compatible aliases
+const runAIAnalysis = runUnifiedAnalysis;
+const runVoiceCommandAnalysis = runUnifiedAnalysis;
 
 // ==========================================================================
 // INTERACTIVE REVIEW & VERIFICATION TABLE
 // ==========================================================================
 
-function displayAIReview(resultJson, selectedCard) {
+function displayAIReview(resultJson, defaultCard) {
     aiAnalysisResults = resultJson;
     const reviewPanel = document.getElementById("aiReviewPanel");
     const reasoningText = document.getElementById("aiReasoningText");
@@ -2760,17 +2917,41 @@ function displayAIReview(resultJson, selectedCard) {
 
     if (!reviewPanel || !reasoningText || !tbody) return;
 
-    reasoningText.innerHTML = (resultJson.reasoning || "İşlem başarıyla çözümlendi.").replace(/\n/g, '<br>');
+    reasoningText.innerHTML = (resultJson.reasoning || "İşlem başarıyla harmanlandı ve çözümlendi.").replace(/\n/g, '<br>');
+
+    // Build options for card selection
+    const allColumns = [
+        ...currentData.expenseHeaders,
+        "Batıkan Maaş",
+        "Işıl Maaş"
+    ];
+
+    const months = currentData.rows.map(r => r.month);
 
     let html = "";
-    const colIndex = currentData.expenseHeaders.indexOf(selectedCard);
 
     if (resultJson.items && Array.isArray(resultJson.items)) {
         resultJson.items.forEach((item, idx) => {
             item.amount = Math.round(Number(item.amount) || 0);
-            
-            // Find existing value
-            const rowIndex = currentData.rows.findIndex(r => r.month.toLowerCase() === item.month.toLowerCase());
+            const itemCard = item.card || defaultCard || currentData.expenseHeaders[0];
+
+            // Card dropdown options
+            let cardOptionsHtml = "";
+            allColumns.forEach(c => {
+                const isSelected = c.toLowerCase() === itemCard.toLowerCase() || (itemCard.toLowerCase().includes(c.toLowerCase()));
+                cardOptionsHtml += `<option value="${c}" ${isSelected ? 'selected' : ''}>${c}</option>`;
+            });
+
+            // Month dropdown options
+            let monthOptionsHtml = "";
+            months.forEach(m => {
+                const isSelected = m.toLowerCase() === (item.month || "").toLowerCase();
+                monthOptionsHtml += `<option value="${m}" ${isSelected ? 'selected' : ''}>${m}</option>`;
+            });
+
+            // Find existing value in current table
+            const colIndex = currentData.expenseHeaders.indexOf(itemCard);
+            const rowIndex = currentData.rows.findIndex(r => r.month.toLowerCase() === (item.month || "").toLowerCase());
             let existingVal = "";
             if (rowIndex !== -1 && colIndex !== -1) {
                 existingVal = currentData.rows[rowIndex].exps[colIndex] || "";
@@ -2784,13 +2965,17 @@ function displayAIReview(resultJson, selectedCard) {
                         <input type="checkbox" class="ai-include-check" checked data-idx="${idx}">
                     </td>
                     <td>
-                        <strong style="color: #ffffff;">${item.month}</strong>
+                        <select class="ai-month-select form-select" data-idx="${idx}" style="padding: 4px 6px; font-size: 12px; font-weight: 700; color: #ffffff;">
+                            ${monthOptionsHtml}
+                        </select>
                     </td>
                     <td>
-                        <span style="color: var(--accent-cyan); font-weight: 600;">${selectedCard}</span>
+                        <select class="ai-card-select form-select" data-idx="${idx}" style="padding: 4px 6px; font-size: 11.5px; font-weight: 600; color: var(--accent-cyan);">
+                            ${cardOptionsHtml}
+                        </select>
                     </td>
                     <td>
-                        <input type="number" class="ai-amount-input" value="${item.amount}" data-idx="${idx}" style="font-weight: 700;">
+                        <input type="number" class="ai-amount-input form-input" value="${item.amount}" data-idx="${idx}" style="font-weight: 700; width: 100px; padding: 4px 8px;">
                     </td>
                     <td style="font-size: 11.5px; color: var(--text-muted);">
                         ${existingLabel}
@@ -2817,15 +3002,6 @@ function displayAIReview(resultJson, selectedCard) {
 function applyAIToTable() {
     if (!aiAnalysisResults || !aiAnalysisResults.items) return;
 
-    const cardSelect = document.getElementById("aiCardSelect");
-    const selectedCard = aiAnalysisResults.detectedCard || (cardSelect ? cardSelect.value : "");
-    const colIndex = currentData.expenseHeaders.indexOf(selectedCard);
-
-    if (colIndex === -1) {
-        alert(`"${selectedCard}" sütunu bütçe tablosunda bulunamadı.`);
-        return;
-    }
-
     const rows = document.querySelectorAll("#aiReviewTableBody tr");
     let appliedCount = 0;
 
@@ -2833,37 +3009,58 @@ function applyAIToTable() {
         const checkbox = tr.querySelector(".ai-include-check");
         if (checkbox && checkbox.checked) {
             const idx = checkbox.getAttribute("data-idx");
-            const item = aiAnalysisResults.items[idx];
+            const monthSelect = tr.querySelector(".ai-month-select");
+            const cardSelect = tr.querySelector(".ai-card-select");
             const amountInput = tr.querySelector(".ai-amount-input");
             const modeSelect = tr.querySelector(".ai-mode-select");
 
+            const selectedMonth = monthSelect ? monthSelect.value : aiAnalysisResults.items[idx].month;
+            const selectedCard = cardSelect ? cardSelect.value : aiAnalysisResults.items[idx].card;
             const finalAmount = Math.round(Number(amountInput.value) || 0);
-            const mode = modeSelect.value;
+            const mode = modeSelect ? modeSelect.value : "replace";
 
-            let rowIndex = currentData.rows.findIndex(r => r.month.toLowerCase() === item.month.toLowerCase());
-            
+            // Find or create row for selected month
+            let rowIndex = currentData.rows.findIndex(r => r.month.toLowerCase() === selectedMonth.toLowerCase());
             if (rowIndex === -1) {
                 const emptyExps = new Array(currentData.expenseHeaders.length).fill("");
-                currentData.rows.push({ month: item.month, inc1: "", inc2: "", exps: emptyExps });
+                currentData.rows.push({ month: selectedMonth, inc1: "", inc2: "", exps: emptyExps });
                 rowIndex = currentData.rows.length - 1;
             }
 
-            const currentCellVal = Math.round(Number(currentData.rows[rowIndex].exps[colIndex]) || 0);
-            
-            if (mode === "add") {
-                currentData.rows[rowIndex].exps[colIndex] = Math.round(currentCellVal + finalAmount);
+            // Check if column is an income column
+            if (selectedCard.toLowerCase().includes("batıkan")) {
+                const currentVal = Math.round(Number(currentData.rows[rowIndex].inc1) || 0);
+                currentData.rows[rowIndex].inc1 = mode === "add" ? Math.round(currentVal + finalAmount) : finalAmount;
+                appliedCount++;
+            } else if (selectedCard.toLowerCase().includes("ışıl") || selectedCard.toLowerCase().includes("isil")) {
+                const currentVal = Math.round(Number(currentData.rows[rowIndex].inc2) || 0);
+                currentData.rows[rowIndex].inc2 = mode === "add" ? Math.round(currentVal + finalAmount) : finalAmount;
+                appliedCount++;
             } else {
-                currentData.rows[rowIndex].exps[colIndex] = Math.round(finalAmount);
-            }
+                // Expense column
+                let colIndex = currentData.expenseHeaders.indexOf(selectedCard);
+                if (colIndex === -1) {
+                    // Create column if it doesn't exist
+                    currentData.expenseHeaders.push(selectedCard);
+                    colIndex = currentData.expenseHeaders.length - 1;
+                    currentData.rows.forEach(r => r.exps.push(""));
+                }
 
-            appliedCount++;
+                const currentCellVal = Math.round(Number(currentData.rows[rowIndex].exps[colIndex]) || 0);
+                if (mode === "add") {
+                    currentData.rows[rowIndex].exps[colIndex] = Math.round(currentCellVal + finalAmount);
+                } else {
+                    currentData.rows[rowIndex].exps[colIndex] = Math.round(finalAmount);
+                }
+                appliedCount++;
+            }
         }
     });
 
     renderTable();
     scrapeAndSave();
 
-    showToast(`🚀 ${appliedCount} aylık ödeme başarıyla "${selectedCard}" sütununa işlendi!`, 3500);
+    showToast(`🚀 ${appliedCount} kalem başarıyla bütçe tablosuna işlendi!`, 3500);
 
     setTimeout(() => {
         switchTab("tab-table");
@@ -2880,44 +3077,41 @@ function cancelAIReview() {
 // Demo Simulators
 function runAIDemo(sampleType = "isbank") {
     const cardSelect = document.getElementById("aiCardSelect");
-    let targetCard = "Garanti";
-    if (cardSelect && cardSelect.options.length > 1) {
-        targetCard = cardSelect.value || cardSelect.options[1].value;
-    }
+    let targetCard = cardSelect && cardSelect.value ? cardSelect.value : "Garanti";
 
     let demoResult = null;
     if (sampleType === "isbank") {
         demoResult = {
-            reasoning: `📸 İş Bankası kart ekstresi analiz edildi:\n` +
-                       `• Toplam Borç: 48.600 ₺\n` +
-                       `• Gelecek Taksitler: 31.200 ₺\n` +
+            reasoning: `📸 İş Bankası çoklu ekstre ve sesli not simülasyonu:\n` +
+                       `• 1. Fotoğraftaki Toplam Borç: 48.600 ₺\n` +
+                       `• 2. Fotoğraftaki Gelecek Taksitler: 31.200 ₺\n` +
+                       `• Kullanıcı Notu: "Şubat borcunu düş, Mart-Nisan taksitlerini ekle"\n` +
                        `• Cari Ay (Şubat) Borcu = 17.400 ₺ (Kuruşsuz Tam Yuvarlandı)\n` +
                        `• Gelecek Taksitler: Mart (12.400 ₺), Nisan (10.800 ₺), Mayıs (8.000 ₺).`,
-            detectedCard: targetCard,
             items: [
-                { month: "Şubat", amount: 17400, note: "Cari Ay Kalan Borç" },
-                { month: "Mart", amount: 12400, note: "Taksitler" },
-                { month: "Nisan", amount: 10800, note: "Taksitler" },
-                { month: "Mayıs", amount: 8000, note: "Taksitler" }
+                { card: "İş Bankası", month: "Şubat", amount: 17400, note: "1. Fotoğraf: Cari Ay Borcu" },
+                { card: "İş Bankası", month: "Mart", amount: 12400, note: "2. Fotoğraf: Taksit 1/3" },
+                { card: "İş Bankası", month: "Nisan", amount: 10800, note: "2. Fotoğraf: Taksit 2/3" },
+                { card: "İş Bankası", month: "Mayıs", amount: 8000, note: "2. Fotoğraf: Taksit 3/3" }
             ]
         };
     } else {
         demoResult = {
-            reasoning: `📸 Garanti BBVA Bonus ekstre ve taksit planı:\n` +
-                       `• Dönem Borcu: 13.750 ₺ (Şubat)\n` +
-                       `• Gelecek Taksitler: Mart (9.500 ₺), Nisan (9.500 ₺), Mayıs (7.200 ₺).`,
-            detectedCard: targetCard,
+            reasoning: `📸 Garanti BBVA Bonus ekstre + Sesli Komut simülasyonu:\n` +
+                       `• Fotoğraftaki Dönem Borcu: 13.750 ₺ (Şubat)\n` +
+                       `• Kullanıcının Sesli Komutu: "Garanti kartıma Mart ayına 9500, Nisan ayına 9500 lira taksit yaz"\n` +
+                       `• Tümü tam sayılara yuvarlandı, kuruşsuz.`,
             items: [
-                { month: "Şubat", amount: 13750, note: "Dönem Borcu" },
-                { month: "Mart", amount: 9500, note: "Gelecek Taksitler" },
-                { month: "Nisan", amount: 9500, note: "Gelecek Taksitler" },
-                { month: "Mayıs", amount: 7200, note: "Gelecek Taksitler" }
+                { card: "Garanti", month: "Şubat", amount: 13750, note: "Fotoğraftan Dönem Borcu" },
+                { card: "Garanti", month: "Mart", amount: 9500, note: "Sesli Komut Girişi" },
+                { card: "Garanti", month: "Nisan", amount: 9500, note: "Sesli Komut Girişi" },
+                { card: "Garanti", month: "Mayıs", amount: 7200, note: "Fotoğraftan Gelecek Taksit" }
             ]
         };
     }
 
     displayAIReview(demoResult, targetCard);
-    showToast("🧪 Örnek simüle edildi! Tabloya aktarabilirsiniz.");
+    showToast("🧪 Çoklu simülasyon hazırlandı! Tabloya aktarabilirsiniz.");
 }
 
 // Modal Handlers
@@ -2968,6 +3162,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const verifiedDefaultKey = ["AQ", "Ab8RN6J9kZdfIx7i8KNxgFRjX-hPgd9wWrLRp3qkUIhoGFj4RQ"].join(".");
     const hasKey = !!(localStorage.getItem("geminiApiKey") || verifiedDefaultKey);
     updateAIStatusBadge(hasKey);
+    renderUploadedImages();
 });
 
 </script>
