@@ -802,6 +802,14 @@ table.titanium-table input[type=number]::-webkit-outer-spin-button {
     background: rgba(15, 23, 42, 0.95);
 }
 
+/* Masked Key to prevent browser password managers from triggering "Save Password?" prompts */
+.masked-key {
+    -webkit-text-security: disc !important;
+    text-security: disc !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    letter-spacing: 2px !important;
+}
+
 /* Upload Dropzone */
 .dropzone {
     border: 2px dashed rgba(255, 255, 255, 0.2);
@@ -1599,7 +1607,7 @@ table.verify-table input[type="number"]:focus {
         <!-- ===================================================================
              TAB 2: AI CREDIT CARD & STATEMENT SCANNER
              =================================================================== -->
-                                        <section id="tab-ai" class="tab-content-panel" style="display: none;">
+                                                <section id="tab-ai" class="tab-content-panel" style="display: none;">
             <div class="ai-container">
 
                 <!-- Left Panel: Multi-Image Upload + Voice + Harmonized Engine -->
@@ -1697,7 +1705,7 @@ table.verify-table input[type="number"]:focus {
                             <label class="form-label" for="aiUserNotes" style="font-size: 11.5px;">
                                 Ses Metni veya Özel Not (Konuştukça buraya dökülür, elinizle de yazabilirsiniz):
                             </label>
-                            <textarea id="aiUserNotes" class="form-input" rows="2" style="font-size: 13px; resize: vertical;" placeholder="Örn: 1. fotoğraftaki Şubat borcunu, 2. fotoğraftaki taksitleri Mart ve Nisan'a Garanti kartıma yaz"></textarea>
+                            <textarea id="aiUserNotes" class="form-input" rows="2" style="font-size: 13px; resize: vertical;" placeholder="Örn: 1. fotoğraftaki Şubat borcunu, 2. fotoğraftaki taksitleri Mart ve Nisan'a Garanti kartıma yaz" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other"></textarea>
                         </div>
                     </div>
 
@@ -1835,7 +1843,7 @@ table.verify-table input[type="number"]:focus {
                 </div>
 
                 <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                    <button class="metal-btn btn-emerald" style="padding: 10px 18px; font-size: 13px;" onclick="CloudSync.pull(true)">
+                    <button class="metal-btn btn-emerald" style="padding: 10px 18px; font-size: 13px;" onclick="CloudSync.manualPull()">
                         ⬇️ Buluttan Şimdi Yenile
                     </button>
                     <button class="metal-btn btn-cyan" style="padding: 10px 18px; font-size: 13px;" onclick="CloudSync.push(false)">
@@ -1860,7 +1868,7 @@ table.verify-table input[type="number"]:focus {
                 <div class="form-group">
                     <label class="form-label" for="settingsGeminiKey">Google Gemini API Anahtarı:</label>
                     <div style="display: flex; gap: 8px;">
-                        <input type="password" id="settingsGeminiKey" class="form-input" placeholder="AIzaSy...">
+                        <input type="text" id="settingsGeminiKey" class="form-input masked-key" placeholder="AIzaSy..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other">
                         <button class="metal-btn btn-cyan" onclick="saveSettingsGeminiKey()">Kaydet</button>
                     </div>
                     <div style="margin-top: 8px; font-size: 12px; color: var(--text-dim);">
@@ -1904,7 +1912,7 @@ table.verify-table input[type="number"]:focus {
                 Google hesabınızla 30 saniyede ücretsiz alabilirsiniz.
             </p>
             <div class="form-group">
-                <input type="password" id="modalApiKeyInput" class="form-input" placeholder="AIzaSy...">
+                <input type="text" id="modalApiKeyInput" class="form-input masked-key" placeholder="AIzaSy..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other">
             </div>
             <div style="margin-bottom: 18px; font-size: 12px;">
                 <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); font-weight: 600;">
@@ -2037,7 +2045,7 @@ function renderTable() {
     currentData.rows.forEach((row, rIndex) => {
         let expensesHTML = "";
         row.exps.forEach((exp) => {
-            expensesHTML += `<td><input type="number" inputmode="numeric" onfocus="this.select()" class="exp-val" value="${exp}" placeholder="0"></td>`;
+            expensesHTML += `<td><input type="number" inputmode="numeric" onfocus="this.select()" class="exp-val" value="${exp}" placeholder="0" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other"></td>`;
         });
 
         bodyHTML += `
@@ -2046,8 +2054,8 @@ function renderTable() {
                     <span class="delete-btn" onclick="removeRow(${rIndex})" title="Bu Ayı Sil">✕</span>
                     <span contenteditable="true" class="month-name">${row.month}</span>
                 </td>
-                <td><input type="number" inputmode="numeric" onfocus="this.select()" class="inc1" value="${row.inc1}" placeholder="0"></td>
-                <td><input type="number" inputmode="numeric" onfocus="this.select()" class="inc2" value="${row.inc2}" placeholder="0"></td>
+                <td><input type="number" inputmode="numeric" onfocus="this.select()" class="inc1" value="${row.inc1}" placeholder="0" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other"></td>
+                <td><input type="number" inputmode="numeric" onfocus="this.select()" class="inc2" value="${row.inc2}" placeholder="0" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other"></td>
                 <td class="total-cell text-income row-inc-total">0 ₺</td>
                 ${expensesHTML}
                 <td class="total-cell text-expense row-exp-total">0 ₺</td>
@@ -3026,7 +3034,7 @@ function displayAIReview(resultJson, defaultCard) {
                         </div>
                     </td>
                     <td>
-                        <input type="number" class="ai-amount-input" value="${item.amount}" data-idx="${idx}" style="font-weight: 800; font-size: 14px; width: 110px; padding: 6px 10px; color: #ffffff; background: rgba(0,0,0,0.35); border: 1px solid var(--border-metal); border-radius: 6px;">
+                        <input type="number" class="ai-amount-input" value="${item.amount}" data-idx="${idx}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other" style="font-weight: 800; font-size: 14px; width: 110px; padding: 6px 10px; color: #ffffff; background: rgba(0,0,0,0.35); border: 1px solid var(--border-metal); border-radius: 6px;">
                     </td>
                     <td style="font-size: 12px; color: var(--text-muted);">
                         ${existingLabel}
@@ -3248,7 +3256,6 @@ const CloudSync = {
                     currentData = cloudBudget;
                     localStorage.setItem("budgetDataTitaniumV1", JSON.stringify(currentData));
                     renderTable();
-                    if (force) showToast("⬇️ En güncel veriler buluttan alındı!");
                 }
                 this.setSyncingBadge(false, "success");
                 return true;
@@ -3259,6 +3266,14 @@ const CloudSync = {
             console.warn("Firebase pull error:", err);
             this.setSyncingBadge(false, "error");
             return false;
+        }
+    },
+
+    // Manual user-triggered pull from UI button
+    async manualPull() {
+        const success = await this.pull(true);
+        if (success) {
+            showToast("⬇️ Veriler buluttan güncellendi!");
         }
     },
 
@@ -3332,10 +3347,9 @@ setInterval(() => {
     }
 }, 10000);
 
-// Initialize on DOM load
+// Initialize on DOM load (Silent background sync, no popups)
 window.addEventListener("DOMContentLoaded", () => {
-    // Immediate pull on load
-    CloudSync.pull(true);
+    CloudSync.pull(false);
 });
 
 </script>
