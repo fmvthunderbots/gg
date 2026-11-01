@@ -1767,7 +1767,7 @@ const tbody = document.getElementById("tableBody");
 // Currency formatter
 const formatCurrency = (num) => {
     if (num === 0 || isNaN(num)) return "0 ₺";
-    return num.toLocaleString('tr-TR') + " ₺";
+    return Math.round(num).toLocaleString('tr-TR') + " ₺";
 };
 
 // ==========================================================================
@@ -2589,6 +2589,7 @@ function displayAIReview(resultJson, selectedCard) {
     const colIndex = currentData.expenseHeaders.indexOf(selectedCard);
 
     resultJson.items.forEach((item, idx) => {
+        item.amount = Math.round(Number(item.amount) || 0);
         // Find existing value in currentData for this month & card
         const rowIndex = currentData.rows.findIndex(r => r.month.toLowerCase() === item.month.toLowerCase());
         let existingVal = "";
@@ -2657,7 +2658,7 @@ function applyAIToTable() {
             const amountInput = tr.querySelector(".ai-amount-input");
             const modeSelect = tr.querySelector(".ai-mode-select");
 
-            const finalAmount = Number(amountInput.value) || 0;
+            const finalAmount = Math.round(Number(amountInput.value) || 0);
             const mode = modeSelect.value; // "add" or "replace"
 
             // Locate target row in budget
@@ -2670,12 +2671,12 @@ function applyAIToTable() {
                 rowIndex = currentData.rows.length - 1;
             }
 
-            const currentCellVal = Number(currentData.rows[rowIndex].exps[colIndex]) || 0;
+            const currentCellVal = Math.round(Number(currentData.rows[rowIndex].exps[colIndex]) || 0);
             
             if (mode === "add") {
-                currentData.rows[rowIndex].exps[colIndex] = currentCellVal + finalAmount;
+                currentData.rows[rowIndex].exps[colIndex] = Math.round(currentCellVal + finalAmount);
             } else {
-                currentData.rows[rowIndex].exps[colIndex] = finalAmount;
+                currentData.rows[rowIndex].exps[colIndex] = Math.round(finalAmount);
             }
 
             appliedCount++;
