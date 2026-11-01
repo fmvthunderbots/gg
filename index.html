@@ -3,640 +3,504 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aylık Gelir Gider Tablosu</title>
-    <style>
-        :root {
-            --bg-color: #f4f7f9;
-            --surface-color: #ffffff;
-            --border-color: #e2e8f0;
-            --text-color: #334155;
-            --text-muted: #64748b;
-            --income-color: #10b981;
-            --expense-color: #ef4444;
-            --header-bg: #f8fafc;
-            --header-hover: #f1f5f9;
-            --btn-blue: #3b82f6;
-            --btn-green: #10b981;
-        }
-
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px 15px;
-        }
-
-        h2 {
-            text-align: center;
-            font-weight: 400;
-            margin-top: 0;
-            margin-bottom: 25px;
-            color: #0f172a;
-            font-size: 24px;
-        }
-
-        .controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-            justify-content: center;
-            align-items: center;
-        }
-
-        button.top-btn, .file-label {
-            background-color: var(--surface-color);
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-            padding: 8px 14px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            display: inline-block;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        }
-
-        button.top-btn:hover, .file-label:hover {
-            background-color: var(--header-hover);
-            border-color: #cbd5e1;
-        }
-
-        .btn-primary { background-color: var(--btn-blue) !important; color: #fff !important; border: none !important; }
-        .btn-primary:hover { background-color: #2563eb !important; }
-        
-        .btn-success { background-color: var(--btn-green) !important; color: #fff !important; border: none !important; }
-        .btn-success:hover { background-color: #059669 !important; }
-
-        .table-container {
-            width: 100%;
-            overflow-x: auto;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            background-color: var(--surface-color);
-            border: 1px solid var(--border-color);
-        }
-
-        table {
-            width: max-content; 
-            border-collapse: collapse;
-            text-align: right;
-            margin: 0 auto;
-        }
-
-        th, td {
-            padding: 8px 6px; 
-            border: 1px solid var(--border-color);
-            position: relative;
-        }
-
-        th {
-            background-color: var(--header-bg);
-            font-weight: 600;
-            text-align: center;
-            color: #475569;
-            font-size: 13px; 
-        }
-
-        .text-income { color: var(--income-color); }
-        .text-expense { color: var(--expense-color); }
-        .total-cell { font-weight: bold; background-color: #f8fafc; white-space: nowrap; padding: 8px 10px; }
-
-        input[type="number"] {
-            width: 85px; /* Sütunlar biraz daha genişletildi */
-            background: transparent;
-            border: none;
-            color: var(--text-color);
-            text-align: right;
-            font-size: 14px;
-            font-family: inherit;
-            box-sizing: border-box;
-            padding: 4px;
-            border-radius: 4px;
-            display: block;
-            margin: 0 auto;
-            transition: background-color 0.2s;
-        }
-
-        input[type="number"]:focus {
-            outline: none;
-            background-color: #f1f5f9;
-        }
-
-        input[type=number]::-webkit-inner-spin-button, 
-        input[type=number]::-webkit-outer-spin-button { 
-            -webkit-appearance: none; margin: 0; 
-        }
-
-        [contenteditable="true"] {
-            border-bottom: 1px dashed #cbd5e1;
-            outline: none;
-            padding: 2px;
-            min-width: 45px;
-            display: inline-block;
-            transition: border-color 0.2s;
-            white-space: nowrap; /* Yazıların alt satıra geçmesini engeller */
-        }
-        
-        [contenteditable="true"]:focus {
-            border-bottom: 1px solid var(--btn-blue);
-            background-color: #f1f5f9;
-            border-radius: 4px;
-        }
-
-        /* Başlık İçeriği - Hepsi yan yana dizecek Flexbox ayarı */
-        .header-content {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px; /* Simgeler arası boşluk */
-            flex-wrap: nowrap; /* Asla alt satıra inme */
-            padding: 4px 2px;
-        }
-
-        .delete-btn {
-            color: var(--expense-color);
-            cursor: pointer;
-            font-size: 12px;
-            opacity: 0.3;
-            transition: opacity 0.2s;
-            user-select: none;
-        }
-        .delete-btn:hover { opacity: 1; }
-        
-        .fill-icon {
-            cursor: pointer;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0.5;
-            transition: all 0.2s;
-            padding: 4px;
-            border-radius: 4px;
-            background-color: #e2e8f0;
-            user-select: none;
-        }
-        .fill-icon:hover {
-            opacity: 1;
-            background-color: #cbd5e1;
-        }
-
-        /* Sürükle Bırak Ayarları */
-        .drag-handle {
-            cursor: grab;
-            color: var(--text-muted);
-            font-size: 14px;
-            opacity: 0.4;
-            user-select: none;
-            display: flex;
-            align-items: center;
-        }
-        .drag-handle:hover { opacity: 1; color: var(--btn-blue); }
-        .draggable-col { cursor: grab; transition: background-color 0.2s; }
-        .draggable-col:active { cursor: grabbing; }
-        .draggable-col.drag-over {
-            background-color: #e2e8f0;
-            border-left: 3px solid var(--btn-blue); /* Sürüklendiğinde nereye düşeceğini gösterir */
-        }
-
-        .month-cell {
-            text-align: left;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-weight: 500;
-            min-width: 65px;
-        }
-
-        .add-col-btn {
-            background-color: #e2e8f0;
-            border: none;
-            color: #475569;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            height: 100%;
-            min-height: 30px;
-            border-radius: 6px;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .add-col-btn:hover { background-color: #cbd5e1; color: var(--btn-blue); }
-
-        .add-row-cell { padding: 0 !important; border: none !important; }
-        
-        .add-row-btn {
-            width: 100%;
-            background-color: var(--header-bg);
-            color: var(--text-muted);
-            border: 1px dashed var(--border-color);
-            border-top: none;
-            padding: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            border-radius: 0 0 12px 12px;
-        }
-        .add-row-btn:hover { background-color: #e2e8f0; color: var(--btn-blue); }
-
-        #toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: var(--btn-green);
-            color: white;
-            padding: 12px 28px;
-            border-radius: 30px;
-            font-weight: 500;
-            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s, transform 0.3s;
-            z-index: 1000;
-        }
-        #toast.show { opacity: 1; transform: translateX(-50%) translateY(-10px); }
-
-    </style>
+    <title>Titanium Finance | Aylık Gelir Gider & AI Ekstre Çözümleyici</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js for Interactive Financial Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <h2>Aylık Gelir Gider Tablosu</h2>
+    <div class="bg-overlay"></div>
 
-    <div class="controls">
-        <button class="top-btn btn-success" onclick="manualSave()">💾 Tarayıcıya Kaydet</button>
-        <button class="top-btn btn-primary" onclick="exportData()">⬇️ Yedeği İndir</button>
-        <label class="file-label">
-            📂 Yedek Yükle <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
-        </label>
+    <div class="app-wrapper">
+
+        <!-- ===================================================================
+             TOP EXECUTIVE HEADER & STATUS BAR
+             =================================================================== -->
+        <header class="header-container">
+            <div class="brand-section">
+                <div class="brand-icon">💎</div>
+                <div class="brand-text">
+                    <h1>TITANIUM FINANCE <span>PRO</span></h1>
+                    <p>Aylık Gelir Gider Kontrolü & Yapay Zeka Destekli Ekstre Çözümleyici</p>
+                </div>
+            </div>
+
+            <div class="header-badges">
+                <div class="status-badge" id="cloudStatusBadge">
+                    <span class="badge-dot dot-online"></span> Bulut: Hazır
+                </div>
+                <div class="status-badge" id="aiStatusBadge">
+                    <span class="badge-dot dot-ai"></span> Gemini AI: Hazır
+                </div>
+                <div class="status-badge" id="lastSyncBadge" style="color: var(--text-muted); font-size: 11px;">
+                    Yerel Kaydedildi
+                </div>
+            </div>
+        </header>
+
+        <!-- ===================================================================
+             EXECUTIVE KPIS & FINANCIAL SUMMARY
+             =================================================================== -->
+        <div class="metrics-grid">
+            <div class="metric-card card-income">
+                <div class="metric-info">
+                    <h4>Toplam Yıllık Gelir</h4>
+                    <div class="metric-value text-income" id="kpiTotalIncome">0 ₺</div>
+                </div>
+                <div class="metric-icon">💰</div>
+            </div>
+
+            <div class="metric-card card-expense">
+                <div class="metric-info">
+                    <h4>Toplam Yıllık Gider</h4>
+                    <div class="metric-value text-expense" id="kpiTotalExpense">0 ₺</div>
+                </div>
+                <div class="metric-icon">💳</div>
+            </div>
+
+            <div class="metric-card card-net">
+                <div class="metric-info">
+                    <h4>Net Birikim / Tasarruf</h4>
+                    <div class="metric-value" id="kpiTotalNet">0 ₺</div>
+                </div>
+                <div class="metric-icon">📈</div>
+            </div>
+
+            <div class="metric-card card-rate">
+                <div class="metric-info">
+                    <h4>Tasarruf Oranı & Zirve Ay</h4>
+                    <div class="metric-value" style="color: #c084fc;" id="kpiSavingsRate">%0 (-)</div>
+                </div>
+                <div class="metric-icon">🎯</div>
+            </div>
+        </div>
+
+        <!-- ===================================================================
+             METALLIC NAVIGATION TABS
+             =================================================================== -->
+        <nav class="tabs-nav">
+            <button class="tab-btn active" data-tab="tab-table" onclick="switchTab('tab-table')">
+                📊 Bütçe Tablosu
+            </button>
+            <button class="tab-btn" data-tab="tab-ai" onclick="switchTab('tab-ai')">
+                🤖 Yapay Zeka Ekstre Okuyucu <span class="tab-badge">AI Vision</span>
+            </button>
+            <button class="tab-btn" data-tab="tab-charts" onclick="switchTab('tab-charts')">
+                📈 Finansal Grafikler
+            </button>
+            <button class="tab-btn" data-tab="tab-sync" onclick="switchTab('tab-sync')">
+                ☁️ Telefon & PC Eşitleme
+            </button>
+            <button class="tab-btn" data-tab="tab-settings" onclick="switchTab('tab-settings')">
+                ⚙️ Ayarlar & API
+            </button>
+        </nav>
+
+        <!-- ===================================================================
+             TAB 1: MAIN BUDGET DATA TABLE
+             =================================================================== -->
+        <main id="tab-table" class="tab-content-panel">
+            <div class="action-bar">
+                <div class="button-group">
+                    <button class="metal-btn btn-emerald" onclick="manualSave()">
+                        💾 Kaydet
+                    </button>
+                    <button class="metal-btn btn-cyan" onclick="exportData()">
+                        ⬇️ Yedeği İndir (JSON)
+                    </button>
+                    <label class="metal-btn">
+                        📂 Yedek Yükle <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+                    </label>
+                    <button class="metal-btn" onclick="CloudSync.push()" title="Tüm verileri anında buluta gönder">
+                        ☁️ Bulutla Eşitle
+                    </button>
+                </div>
+
+                <div class="button-group">
+                    <button class="metal-btn btn-ai-special" onclick="switchTab('tab-ai')">
+                        🤖 Ekstre / Taksit Fotoğrafı Çözümle
+                    </button>
+                    <button class="metal-btn" onclick="addCol()">
+                        ➕ Sütun Ekle
+                    </button>
+                    <button class="metal-btn" onclick="addRow()">
+                        ➕ Ay Ekle
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-panel">
+                <div class="table-scroll-container">
+                    <table id="financeTable" class="titanium-table">
+                        <thead id="tableHead"></thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <!-- ===================================================================
+             TAB 2: AI CREDIT CARD & STATEMENT SCANNER
+             =================================================================== -->
+        <section id="tab-ai" class="tab-content-panel" style="display: none;">
+            <div class="ai-container">
+
+                <!-- Left Panel: Upload & Card Selection -->
+                <div class="metallic-panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <span>🤖</span>
+                            <span>Kredi Kartı Ekstre & Taksit Çözümleyici</span>
+                        </div>
+                        <button class="metal-btn" onclick="openApiKeyModal()" style="font-size: 11.5px; padding: 4px 10px;">
+                            🔑 Gemini API Key
+                        </button>
+                    </div>
+
+                    <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 18px; line-height: 1.5;">
+                        İş Bankası, Axess, Garanti vb. kredi kartlarınızın dönem borcu veya gelecek taksitler ekran görüntüsünü yükleyin. 
+                        Yapay zeka karmaşık gösterimleri (toplam borç, gelecek taksit farkı vb.) anlayıp tablonuza uygun şekilde ayrıştırır.
+                    </p>
+
+                    <!-- Step 1: Card Selection -->
+                    <div class="form-group">
+                        <label class="form-label" for="aiCardSelect">
+                            1. Ekstrenin Ait Olduğu Kredi Kartı / Gider Sütunu:
+                        </label>
+                        <select id="aiCardSelect" class="form-select">
+                            <option value="">— Kredi Kartı Seçin —</option>
+                        </select>
+                    </div>
+
+                    <!-- Step 2: Upload Zone -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            2. Ekstre / Taksit Fotoğrafı veya Ekran Görüntüsü:
+                        </label>
+                        <div id="aiDropzone" class="dropzone">
+                            <div id="dropzonePrompt">
+                                <div class="dropzone-icon">📷</div>
+                                <div class="dropzone-text">Fotoğrafı buraya sürükleyin veya tıklayarak seçin</div>
+                                <div class="dropzone-subtext">Mobilde doğrudan kamera açılır • Veya ekran görüntüsü alıp <strong>Ctrl + V</strong> ile yapıştırın</div>
+                            </div>
+
+                            <div id="aiPreviewContainer" class="preview-container">
+                                <img id="aiPreviewImg" class="preview-img" alt="Ekstre Önizleme">
+                                <button type="button" id="aiRemoveImgBtn" class="preview-remove-btn" title="Görseli Kaldır">✕</button>
+                            </div>
+                        </div>
+                        <input type="file" id="aiFileInput" accept="image/*" capture="environment" style="display: none;">
+                    </div>
+
+                    <!-- Step 3: Optional User Note -->
+                    <div class="form-group">
+                        <label class="form-label" for="aiUserNotes">
+                            3. İsteğe Bağlı Not / İpucu:
+                        </label>
+                        <input type="text" id="aiUserNotes" class="form-input" placeholder="Örn: Toplam borçtan gelecek taksitleri çıkar, kalan Şubat borcudur.">
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
+                        <button id="aiAnalyzeBtn" class="metal-btn btn-ai-special" style="flex: 1; padding: 12px 18px; font-size: 14px; justify-content: center;" onclick="runAIAnalysis()">
+                            ✨ Yapay Zeka ile Analiz Et
+                        </button>
+                    </div>
+
+                    <!-- Demo Testing Buttons -->
+                    <div style="margin-top: 20px; padding-top: 16px; border-top: 1px dashed var(--border-metal);">
+                        <span style="font-size: 11.5px; color: var(--text-muted); display: block; margin-bottom: 8px;">
+                            🧪 Fotoğraf yüklemeden sistemi hemen denemek için:
+                        </span>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button class="metal-btn" onclick="runAIDemo('isbank')" style="font-size: 11.5px;">
+                                🏦 Örnek İş Bankası Ekstresi ile Test Et
+                            </button>
+                            <button class="metal-btn" onclick="runAIDemo('garanti')" style="font-size: 11.5px;">
+                                🏦 Örnek Garanti Ekstresi ile Test Et
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Panel: AI Reasoning & Verification Review -->
+                <div class="metallic-panel" id="aiReviewPanel" style="display: none;">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <span>🔍</span>
+                            <span>Yapay Zeka Analiz Sonucu & Kontrol</span>
+                        </div>
+                        <span style="font-size: 11.5px; color: #34d399; font-weight: 600;">✓ Çözümlendi</span>
+                    </div>
+
+                    <!-- AI Reasoning Explanation Box -->
+                    <div class="ai-reasoning-card">
+                        <div class="reasoning-header">
+                            <span>🧠</span>
+                            <span>Yapay Zeka Muhakemesi & Hesaplama Yolu:</span>
+                        </div>
+                        <div class="reasoning-body" id="aiReasoningText"></div>
+                    </div>
+
+                    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+                        Tablonuza aktarılmadan önce aşağıdaki değerleri kontrol edebilir, gerekirse kutulara tıklayarak değiştirebilirsiniz:
+                    </p>
+
+                    <!-- Interactive Editable Review Table -->
+                    <div class="verify-table-container">
+                        <table class="verify-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 35px; text-align: center;">Seç</th>
+                                    <th>Hedef Ay</th>
+                                    <th>Kart / Sütun</th>
+                                    <th style="width: 110px;">İşlenecek Tutar</th>
+                                    <th>Tablodaki Durum</th>
+                                    <th>İşlem Türü</th>
+                                    <th>Açıklama</th>
+                                </tr>
+                            </thead>
+                            <tbody id="aiReviewTableBody"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- Confirmation Action Bar -->
+                    <div style="display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap;">
+                        <button class="metal-btn btn-emerald" style="flex: 2; padding: 12px 18px; font-size: 14px; justify-content: center;" onclick="applyAIToTable()">
+                            🚀 Onayla ve Bütçe Tablosuna Aktar
+                        </button>
+                        <button class="metal-btn" style="flex: 1; justify-content: center;" onclick="cancelAIReview()">
+                            ✕ İptal
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ===================================================================
+             TAB 3: CHARTS & FINANCIAL REPORTS
+             =================================================================== -->
+        <section id="tab-charts" class="tab-content-panel" style="display: none;">
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <span>📊</span>
+                            <span>Aylık Nakit Akışı (Gelir vs Gider vs Net)</span>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="cashflowChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <span>🍩</span>
+                            <span>Kredi Kartı & Gider Dağılımı</span>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================================================================
+             TAB 4: CROSS-DEVICE CLOUD SYNC (GITHUB GIST & QR)
+             =================================================================== -->
+        <section id="tab-sync" class="tab-content-panel" style="display: none;">
+            <div class="sync-grid">
+
+                <!-- Cloud Sync Setup Card -->
+                <div class="sync-card">
+                    <h3><span>☁️</span> Bulut Senkronizasyon Ayarları</h3>
+                    <p>
+                        Bu sistemi hem bilgisayarınızda hem cep telefonunuzda açtığınızda her zaman en güncel verilerinizi 
+                        görmenizi sağlar. GitHub Gist üzerinden tamamen ücretsiz ve gizli olarak çalışır.
+                    </p>
+
+                    <div class="form-group">
+                        <label class="form-label" for="syncGithubToken">GitHub Personal Access Token (PAT):</label>
+                        <input type="password" id="syncGithubToken" class="form-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+                        <span style="font-size: 11px; color: var(--text-dim); display: block; margin-top: 4px;">
+                            GitHub Ayarlar -> Developer Settings -> Tokens (classic) -> "gist" iznini işaretleyip token alın.
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="syncGistId">Gist ID:</label>
+                        <input type="text" id="syncGistId" class="form-input" placeholder="Otomatik oluşturmak için alttaki butona tıklayın">
+                    </div>
+
+                    <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
+                        <button id="btnCreateGist" class="metal-btn btn-cyan" style="flex: 1; justify-content: center;">
+                            ✨ Yeni Otomatik Gist Oluştur
+                        </button>
+                        <button id="btnSaveSyncSettings" class="metal-btn" style="justify-content: center;">
+                            💾 Ayarları Kaydet
+                        </button>
+                    </div>
+
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; border-top: 1px solid var(--border-metal); padding-top: 14px;">
+                        <button id="btnManualPull" class="metal-btn btn-emerald" style="flex: 1; justify-content: center;">
+                            ⬇️ Buluttan Verileri Şimdi İndir
+                        </button>
+                        <button id="btnManualPush" class="metal-btn" style="flex: 1; justify-content: center;">
+                            ⬆️ Yerel Verileri Buluta Yükle
+                        </button>
+                    </div>
+
+                    <div style="margin-top: 12px; display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="syncAutoCheck" checked>
+                        <label for="syncAutoCheck" style="font-size: 12px; color: var(--text-secondary); cursor: pointer;">
+                            Her değişiklikte otomatik olarak bulut ile senkronize et
+                        </label>
+                    </div>
+                </div>
+
+                <!-- QR Code Device Pairing Card -->
+                <div class="sync-card">
+                    <h3><span>📱</span> Telefonda Tek Tıkla Aç (QR Kod)</h3>
+                    <p>
+                        Bulut bağlantısını bir kez kurduktan sonra alttaki QR kodu telefonunuzun kamerasıyla okutun. 
+                        Hiçbir şifre girmeden telefonunuzdaki tarayıcıda aynı tablo ve senkronizasyon anında açılacaktır!
+                    </p>
+
+                    <div class="qr-box" id="syncQrBox">
+                        <span style="font-size: 12px; color: #64748b;">(GitHub Token ve Gist ID bağlandığında QR kod burada oluşturulur)</span>
+                    </div>
+
+                    <div style="margin-top: 16px; padding: 12px; background: rgba(0,0,0,0.25); border-radius: var(--radius-md); font-size: 12px; color: var(--text-muted); line-height: 1.5;">
+                        💡 <strong>İpucu:</strong> Telefonunuzda Safari veya Chrome ile bu sayfayı açtığınızda <em>"Ana Ekrana Ekle"</em> (Add to Home Screen) diyerek tam ekran bir mobil uygulama gibi kullanabilirsiniz!
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ===================================================================
+             TAB 5: SETTINGS & API CONFIGURATION
+             =================================================================== -->
+        <section id="tab-settings" class="tab-content-panel" style="display: none;">
+            <div class="metallic-panel" style="max-width: 680px; margin: 0 auto;">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <span>⚙️</span>
+                        <span>Sistem ve API Ayarları</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="settingsGeminiKey">Google Gemini API Anahtarı:</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="password" id="settingsGeminiKey" class="form-input" placeholder="AIzaSy...">
+                        <button class="metal-btn btn-cyan" onclick="saveSettingsGeminiKey()">Kaydet</button>
+                    </div>
+                    <div style="margin-top: 8px; font-size: 12px; color: var(--text-dim);">
+                        Ücretsiz API anahtarı almak için: 
+                        <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); font-weight: 600;">
+                            Google AI Studio (Ücretsiz Al) ↗
+                        </a>
+                    </div>
+                </div>
+
+                <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-metal);">
+                    <h4 style="font-size: 14px; margin-bottom: 10px; color: var(--text-secondary);">Arka Plan & Tema Bilgisi</h4>
+                    <p style="font-size: 12.5px; color: var(--text-muted); line-height: 1.6;">
+                        Tablonuz için hazırlanan <strong>financial_metallic_bg.jpg</strong> yüksek çözünürlüklü koyu titanyum & fırçalanmış çelik arka planı devrede. 
+                        GitHub'a yüklendiğinde görseller otomatik olarak GitHub Pages ile uyumlu çalışır.
+                    </p>
+                </div>
+
+                <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-metal);">
+                    <h4 style="font-size: 14px; margin-bottom: 10px; color: var(--expense-color);">Tehlikeli Bölge</h4>
+                    <button class="metal-btn" style="background: rgba(244, 63, 94, 0.15); border-color: rgba(244, 63, 94, 0.35); color: #fb7185;" onclick="resetToFactoryDefaults()">
+                        ⚠️ Tüm Verileri Sıfırla ve Varsayılana Dön
+                    </button>
+                </div>
+            </div>
+        </section>
+
     </div>
-    
-    <div class="table-container">
-        <table id="financeTable">
-            <thead id="tableHead"></thead>
-            <tbody id="tableBody"></tbody>
-        </table>
+
+    <!-- ===================================================================
+         GEMINI API KEY MODAL
+         =================================================================== -->
+    <div id="apiKeyModal" class="modal-backdrop">
+        <div class="modal-panel">
+            <div class="modal-header">
+                <h3>🔑 Gemini API Anahtarı Kurulumu</h3>
+                <button class="modal-close-btn" onclick="closeApiKeyModal()">✕</button>
+            </div>
+            <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 14px; line-height: 1.5;">
+                Kredi kartı ekstre ve taksit fotoğraflarını yapay zeka ile okuyabilmek için ücretsiz bir Gemini API anahtarı gereklidir. 
+                Google hesabınızla 30 saniyede ücretsiz alabilirsiniz.
+            </p>
+            <div class="form-group">
+                <input type="password" id="modalApiKeyInput" class="form-input" placeholder="AIzaSy...">
+            </div>
+            <div style="margin-bottom: 18px; font-size: 12px;">
+                <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); font-weight: 600;">
+                    👉 Google AI Studio'dan Ücretsiz Key Al ↗
+                </a>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="metal-btn" onclick="closeApiKeyModal()">İptal</button>
+                <button class="metal-btn btn-cyan" onclick="saveApiKeyFromModal()">Kaydet ve Etkinleştir</button>
+            </div>
+        </div>
     </div>
 
-    <div id="toast">✅ Başarıyla Kaydedildi!</div>
+    <!-- Toast Notification -->
+    <div id="toast">✅ İşlem Başarılı</div>
 
+    <!-- Application Scripts -->
+    <script src="app.js"></script>
+    <script src="ai-scanner.js"></script>
+    <script src="cloud-sync.js"></script>
+    <script src="charts.js"></script>
+
+    <!-- Additional Inline Helpers for Settings Tab -->
     <script>
-        const defaultData = {
-            expenseHeaders: [
-                "Axess", "Wings", "Money", "Garanti", 
-                "İş Bankası Batı", "İş Bankası Işıl", 
-                "Yapı Kredi", "Opet", "Kira", "Market", 
-                "Diğer", "Araba"
-            ],
-            rows: [
-                { month: "Şubat", inc1: "114000", inc2: "108000", exps: ["", "", "", "", "", "", "", "", "", "", "", ""] },
-                { month: "Mart", inc1: "110750", inc2: "105000", exps: ["", "", "", "", "", "", "", "", "", "", "", ""] },
-                { month: "Nisan", inc1: "107900", inc2: "102000", exps: ["", "", "", "", "", "", "", "", "", "", "", ""] },
-                { month: "Mayıs", inc1: "99250", inc2: "95500", exps: ["", "", "", "", "", "", "", "", "", "", "", ""] },
-                { month: "Haziran", inc1: "98750", inc2: "93250", exps: ["", "", "", "", "", "", "", "", "", "", "", ""] },
-                { month: "Temmuz", inc1: "98750", inc2: "93250", exps: ["", "", "", "", "", "", "", "", "", "", "", ""] },
-                { month: "Ağustos", inc1: "99000", inc2: "93600", exps: ["", "", "", "", "", "", "", "", "", "", "", ""] },
-                { month: "Eylül", inc1: "100150", inc2: "94725", exps: ["", "", "", "", "", "", "", "", "", "", "", ""] },
-                { month: "Ekim", inc1: "100150", inc2: "94725", exps: ["", "", "", "", "", "", "", "", "", "", "", ""] },
-                { month: "Kasım", inc1: "100150", inc2: "94725", exps: ["", "", "", "", "", "", "", "", "", "", "", ""] },
-                { month: "Aralık", inc1: "100150", inc2: "94725", exps: ["", "", "", "", "", "", "", "", "", "", "", ""] },
-                { month: "Ocak", inc1: "94600", inc2: "94725", exps: ["", "", "", "", "", "", "", "", "", "", "", ""] }
-            ]
-        };
-
-        let currentData = JSON.parse(localStorage.getItem("budgetDataLightV3")) || defaultData;
-
-        const table = document.getElementById("financeTable");
-        const thead = document.getElementById("tableHead");
-        const tbody = document.getElementById("tableBody");
-
-        const formatCurrency = (num) => {
-            if (num === 0) return "0 ₺";
-            return num.toLocaleString('tr-TR') + " ₺";
-        };
-
-        function renderTable() {
-            let headHTML = `
-                <tr>
-                    <th rowspan="2">Aylar</th>
-                    <th colspan="3" class="text-income">Gelirler</th>
-                    <th colspan="${currentData.expenseHeaders.length + 2}" class="text-expense">Giderler</th>
-                    <th rowspan="2">Kalan (Net)</th>
-                </tr>
-                <tr>
-                    <th class="text-income">
-                        <div class="header-content">
-                            <span>Batıkan Maaş</span>
-                            <span class="fill-icon" onclick="fillAll('inc1', 'Batıkan Maaş')" title="Tümüne Uygula">🔽</span>
-                        </div>
-                    </th>
-                    <th class="text-income">
-                        <div class="header-content">
-                            <span>Işıl Maaş</span>
-                            <span class="fill-icon" onclick="fillAll('inc2', 'Işıl Maaş')" title="Tümüne Uygula">🔽</span>
-                        </div>
-                    </th>
-                    <th class="text-income total-cell">Toplam Gelir</th>
-            `;
-            
-            // Sürükle bırak için Drag and Drop özellikleri (draggable="true" ve ondrag eventleri) eklendi
-            currentData.expenseHeaders.forEach((header, index) => {
-                headHTML += `
-                    <th class="text-expense draggable-col" draggable="true" 
-                        ondragstart="dragStart(event, ${index})" 
-                        ondragover="dragOver(event)" 
-                        ondragenter="dragEnter(event, ${index})"
-                        ondragleave="dragLeave(event, ${index})"
-                        ondrop="drop(event, ${index})"
-                        id="col-head-${index}">
-                        <div class="header-content">
-                            <span class="drag-handle" title="Tutup Sürükle">⣿</span>
-                            <span class="delete-btn" onclick="removeCol(${index})" title="Sütunu Sil">✖</span>
-                            <span contenteditable="true" class="exp-header-text">${header}</span>
-                            <span class="fill-icon" onclick="fillAll('exp', '${header}', ${index})" title="Tümüne Uygula">🔽</span>
-                        </div>
-                    </th>
-                `;
-            });
-            
-            headHTML += `
-                    <th class="text-expense total-cell">Toplam Gider</th>
-                    <th style="width: 35px; padding: 4px;">
-                        <button class="add-col-btn" onclick="addCol()" title="Yeni Gider Sütunu Ekle">+</button>
-                    </th>
-                </tr>
-            `;
-            thead.innerHTML = headHTML;
-
-            let bodyHTML = "";
-            currentData.rows.forEach((row, rIndex) => {
-                let expensesHTML = "";
-                row.exps.forEach((exp) => {
-                    expensesHTML += `<td><input type="number" class="exp-val" value="${exp}" placeholder="0"></td>`;
-                });
-
-                bodyHTML += `
-                    <tr class="data-row">
-                        <td class="month-cell">
-                            <span class="delete-btn" onclick="removeRow(${rIndex})" title="Satırı Sil">✖</span>
-                            <span contenteditable="true" class="month-name">${row.month}</span>
-                        </td>
-                        <td><input type="number" class="inc1" value="${row.inc1}" placeholder="0"></td>
-                        <td><input type="number" class="inc2" value="${row.inc2}" placeholder="0"></td>
-                        <td class="total-cell text-income row-inc-total">0 ₺</td>
-                        ${expensesHTML}
-                        <td class="total-cell text-expense row-exp-total">0 ₺</td>
-                        <td style="background-color: var(--header-bg);"></td>
-                        <td class="total-cell row-net">0 ₺</td>
-                    </tr>
-                `;
-            });
-
-            const totalColumns = 1 + 3 + currentData.expenseHeaders.length + 2 + 1;
-            bodyHTML += `
-                <tr>
-                    <td colspan="${totalColumns}" class="add-row-cell">
-                        <button class="add-row-btn" onclick="addRow()">+ Yeni Ay (Satır) Ekle</button>
-                    </td>
-                </tr>
-            `;
-
-            tbody.innerHTML = bodyHTML;
-            updateAllTotals();
-        }
-
-        // --- SÜRÜKLE BIRAK (DRAG & DROP) İŞLEMLERİ ---
-        let draggedColIndex = null;
-
-        function dragStart(e, index) {
-            draggedColIndex = index;
-            e.dataTransfer.effectAllowed = 'move';
-            // Tarayıcı uyumluluğu için
-            e.dataTransfer.setData('text/plain', index); 
-        }
-
-        function dragOver(e) {
-            e.preventDefault(); // Sürüklenen öğenin bırakılmasına izin ver
-            e.dataTransfer.dropEffect = 'move';
-            return false;
-        }
-
-        function dragEnter(e, index) {
-            e.preventDefault();
-            if (index !== draggedColIndex) {
-                document.getElementById(`col-head-${index}`).classList.add('drag-over');
-            }
-        }
-
-        function dragLeave(e, index) {
-            document.getElementById(`col-head-${index}`).classList.remove('drag-over');
-        }
-
-        function drop(e, index) {
-            e.stopPropagation();
-            document.getElementById(`col-head-${index}`).classList.remove('drag-over');
-            
-            // Eğer sütun farklı bir yere bırakıldıysa
-            if (draggedColIndex !== null && draggedColIndex !== index) {
-                // Başlıkların sırasını güncelle
-                const movedHeader = currentData.expenseHeaders.splice(draggedColIndex, 1)[0];
-                currentData.expenseHeaders.splice(index, 0, movedHeader);
-                
-                // Her bir aydaki (satırdaki) veri sırasını güncelle
-                currentData.rows.forEach(row => {
-                    const movedExp = row.exps.splice(draggedColIndex, 1)[0];
-                    row.exps.splice(index, 0, movedExp);
-                });
-                
-                renderTable();
-                scrapeAndSave();
-            }
-            draggedColIndex = null;
-            return false;
-        }
-
-
-        function fillAll(type, headerName, colIndex = -1) {
-            const val = prompt(`Tüm aylar için "${headerName}" sütununa yazılacak ortak değeri girin:\n(Örn: 25000)`, "");
-            
-            if (val !== null && val.trim() !== "") {
-                const numVal = Number(val);
-                if (!isNaN(numVal)) {
-                    currentData.rows.forEach(row => {
-                        if (type === 'inc1') row.inc1 = numVal;
-                        else if (type === 'inc2') row.inc2 = numVal;
-                        else if (type === 'exp') row.exps[colIndex] = numVal;
-                    });
-                    renderTable();
-                    scrapeAndSave();
-                    showToast("✅ Tüm aylara uygulandı!");
-                } else {
-                    alert("Lütfen sadece rakam girin.");
-                }
-            }
-        }
-
-        function scrapeAndSave() {
-            const headerSpans = document.querySelectorAll('.exp-header-text');
-            currentData.expenseHeaders = Array.from(headerSpans).map(span => span.innerText.trim());
-
-            const trs = tbody.querySelectorAll('tr.data-row');
-            currentData.rows = Array.from(trs).map(tr => {
-                return {
-                    month: tr.querySelector('.month-name').innerText.trim(),
-                    inc1: tr.querySelector('.inc1').value,
-                    inc2: tr.querySelector('.inc2').value,
-                    exps: Array.from(tr.querySelectorAll('.exp-val')).map(inp => inp.value)
-                };
-            });
-
-            localStorage.setItem("budgetDataLightV3", JSON.stringify(currentData));
-        }
-
-        function calculateRow(tr) {
-            const inc1 = Number(tr.querySelector('.inc1').value) || 0;
-            const inc2 = Number(tr.querySelector('.inc2').value) || 0;
-            const totalInc = inc1 + inc2;
-            
-            let totalExp = 0;
-            tr.querySelectorAll('.exp-val').forEach(inp => {
-                totalExp += Math.abs(Number(inp.value)) || 0;
-            });
-
-            const net = totalInc - totalExp;
-
-            tr.querySelector('.row-inc-total').textContent = formatCurrency(totalInc);
-            tr.querySelector('.row-exp-total').textContent = formatCurrency(totalExp);
-            
-            const netCell = tr.querySelector('.row-net');
-            netCell.textContent = formatCurrency(net);
-            
-            if (net > 0) {
-                netCell.style.color = "var(--income-color)";
-                netCell.style.fontWeight = "bold";
-            } else if (net < 0) {
-                netCell.style.color = "var(--expense-color)";
-                netCell.style.fontWeight = "bold";
+        function saveSettingsGeminiKey() {
+            const input = document.getElementById("settingsGeminiKey");
+            if (!input) return;
+            const val = input.value.trim();
+            if (val) {
+                localStorage.setItem("geminiApiKey", val);
+                updateAIStatusBadge(true);
+                showToast("🔑 Gemini API Anahtarı kaydedildi!");
             } else {
-                netCell.style.color = "inherit";
+                localStorage.removeItem("geminiApiKey");
+                updateAIStatusBadge(false);
+                showToast("API Anahtarı silindi");
             }
         }
 
-        function updateAllTotals() {
-            tbody.querySelectorAll('tr.data-row').forEach(tr => calculateRow(tr));
-        }
-
-        table.addEventListener('input', (e) => {
-            if (e.target.tagName === 'INPUT') {
-                calculateRow(e.target.closest('tr'));
-            }
-            scrapeAndSave(); 
-        });
-
-        table.addEventListener('keydown', (e) => {
-            if (e.target.hasAttribute('contenteditable') && e.key === 'Enter') {
-                e.preventDefault();
-                e.target.blur();
-                scrapeAndSave();
-            }
-        });
-
-        table.addEventListener('focusout', (e) => {
-             if (e.target.hasAttribute('contenteditable')) {
-                 scrapeAndSave();
-                 renderTable(); 
-             }
-        });
-
-        function addRow() {
-            scrapeAndSave(); 
-            const emptyExps = new Array(currentData.expenseHeaders.length).fill("");
-            currentData.rows.push({ month: "Yeni Ay", inc1: "", inc2: "", exps: emptyExps });
-            renderTable();
-            scrapeAndSave();
-        }
-
-        function removeRow(index) {
-            if(confirm("Bu ayı silmek istediğinize emin misiniz?")) {
-                currentData.rows.splice(index, 1);
+        function resetToFactoryDefaults() {
+            if (confirm("DİKKAT: Tüm bütçe verileriniz sıfırlanacak ve varsayılan ilk tabloya dönülecektir. Devam etmek istiyor musunuz?")) {
+                localStorage.removeItem("budgetDataTitaniumV1");
+                currentData = JSON.parse(JSON.stringify(defaultBudgetData));
                 renderTable();
                 scrapeAndSave();
+                showToast("🔄 Tablo varsayılan değerlere sıfırlandı!");
             }
         }
 
-        function addCol() {
-            scrapeAndSave();
-            currentData.expenseHeaders.push("Yeni Gider");
-            currentData.rows.forEach(row => row.exps.push(""));
-            renderTable();
-            scrapeAndSave();
-        }
-
-        function removeCol(index) {
-            if(confirm("Bu gider sütununu tamamen silmek istediğinize emin misiniz?")) {
-                currentData.expenseHeaders.splice(index, 1);
-                currentData.rows.forEach(row => row.exps.splice(index, 1));
-                renderTable();
-                scrapeAndSave();
-            }
-        }
-
-        function manualSave() {
-            scrapeAndSave();
-            showToast("✅ Başarıyla Kaydedildi!");
-        }
-
-        function showToast(message) {
-            const toast = document.getElementById("toast");
-            toast.innerText = message;
-            toast.classList.add("show");
-            setTimeout(() => { toast.classList.remove("show"); }, 2000);
-        }
-
-        function exportData() {
-            scrapeAndSave(); 
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentData));
-            const dlAnchorElem = document.createElement('a');
-            dlAnchorElem.setAttribute("href", dataStr);
-            dlAnchorElem.setAttribute("download", "gelir_gider_yedek.json");
-            document.body.appendChild(dlAnchorElem);
-            dlAnchorElem.click();
-            dlAnchorElem.remove();
-        }
-
-        function importData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const importedData = JSON.parse(e.target.result);
-                    if (importedData.expenseHeaders && importedData.rows) {
-                        currentData = importedData;
-                        renderTable();
-                        scrapeAndSave();
-                        alert("Veri başarıyla yüklendi!");
-                    } else {
-                        alert("Hata: Yüklenen dosya uygun formatta değil.");
-                    }
-                } catch (err) {
-                    alert("Dosya okuma hatası oluştu!");
-                }
-                document.getElementById('importFile').value = ""; 
-            };
-            reader.readAsText(file);
-        }
-
-        renderTable();
-
+        // On load settings population
+        window.addEventListener("DOMContentLoaded", () => {
+            const sKey = document.getElementById("settingsGeminiKey");
+            if (sKey) sKey.value = localStorage.getItem("geminiApiKey") || "";
+        });
     </script>
 </body>
 </html>
